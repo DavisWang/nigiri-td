@@ -68,7 +68,32 @@ export const ENEMY_DATA = [
     { id: 'wagyu', name: 'Wagyu', hp: 443, speed: 1.0, money: 42, lifePenalty: 6, tier: 'Boss', color: '#EF5350' },
 ];
 
+/**
+ * Baseline HP step multipliers R1→R2 … R9→R10 (linear ramp 1.3× → 1.7×).
+ * Regenerate waves: `node scripts/generate-balanced-rounds.mjs`
+ */
+export const ROUND_HP_STEP_MULTS = Object.freeze([
+    1.3, 1.35, 1.4, 1.45, 1.5, 1.55, 1.6, 1.65, 1.7,
+]);
+
+/** Strength tiers 1–10: round R primarily uses `ENEMY_STRENGTH_IDS[R-1]` plus types within ±2 tiers (clamped). */
+export const ENEMY_STRENGTH_IDS = ENEMY_DATA.map((e) => e.id);
+
 function e(id, count) { return { id, count }; }
+
+/** Regenerate: `node scripts/generate-balanced-rounds.mjs` (PRIMARY_HP_FRAC in script). */
+const SHARED_ROUNDS = [
+    { round: 1, waves: [e('tamago', 8)], spawnInterval: 1700 },
+    { round: 2, waves: [e('salmon', 3), e('tamago', 1), e('squid', 1)], spawnInterval: 1560 },
+    { round: 3, waves: [e('squid', 2), e('tamago', 1), e('salmon', 1), e('shrimp', 1)], spawnInterval: 1420 },
+    { round: 4, waves: [e('shrimp', 3), e('salmon', 1), e('squid', 1), e('tuna', 1)], spawnInterval: 1300 },
+    { round: 5, waves: [e('tuna', 4), e('squid', 1), e('shrimp', 1), e('mackerel', 1)], spawnInterval: 1180 },
+    { round: 6, waves: [e('mackerel', 4), e('shrimp', 1), e('tuna', 1), e('scallop', 1), e('ikura', 1)], spawnInterval: 1080 },
+    { round: 7, waves: [e('scallop', 5), e('tuna', 2), e('mackerel', 1), e('ikura', 1), e('uni', 1)], spawnInterval: 1000 },
+    { round: 8, waves: [e('ikura', 6), e('mackerel', 2), e('scallop', 2), e('uni', 1), e('wagyu', 1)], spawnInterval: 920 },
+    { round: 9, waves: [e('uni', 7), e('scallop', 3), e('ikura', 3), e('wagyu', 3)], spawnInterval: 850 },
+    { round: 10, waves: [e('wagyu', 9), e('ikura', 8), e('uni', 7)], spawnInterval: 780 },
+];
 
 const KAITEN_PATH = [
     {x:0,y:0},{x:1,y:0},{x:2,y:0},{x:3,y:0},{x:4,y:0},{x:5,y:0},{x:6,y:0},{x:7,y:0},
@@ -83,25 +108,12 @@ const KAITEN_PATH = [
     {x:7,y:9},
 ];
 
-const KAITEN_ROUNDS = [
-    { round: 1, waves: [e('tamago', 8)], spawnInterval: 1700 },
-    { round: 2, waves: [e('tamago', 5), e('salmon', 4)], spawnInterval: 1560 },
-    { round: 3, waves: [e('salmon', 5), e('squid', 5)], spawnInterval: 1380 },
-    { round: 4, waves: [e('squid', 4), e('shrimp', 5), e('tuna', 3)], spawnInterval: 1270 },
-    { round: 5, waves: [e('shrimp', 5), e('tuna', 5), e('mackerel', 3)], spawnInterval: 1180 },
-    { round: 6, waves: [e('mackerel', 6), e('scallop', 3), e('salmon', 4)], spawnInterval: 1090 },
-    { round: 7, waves: [e('scallop', 4), e('ikura', 3), e('tuna', 6)], spawnInterval: 1010 },
-    { round: 8, waves: [e('ikura', 4), e('uni', 3), e('mackerel', 5)], spawnInterval: 920 },
-    { round: 9, waves: [e('uni', 4), e('wagyu', 2), e('scallop', 4)], spawnInterval: 850 },
-    { round: 10, waves: [e('wagyu', 3), e('uni', 4), e('ikura', 5)], spawnInterval: 750 },
-];
-
 export const MAP_DEFINITIONS = [
     {
         id: 'kaiten', name: 'Kaiten Corner',
         type: 'single',
         path: KAITEN_PATH,
-        rounds: KAITEN_ROUNDS,
+        rounds: SHARED_ROUNDS,
     },
     {
         id: 'fork', name: 'The Fork',
@@ -110,18 +122,7 @@ export const MAP_DEFINITIONS = [
         branchA: [{x:4,y:0},{x:5,y:0},{x:6,y:0},{x:7,y:0},{x:7,y:1},{x:7,y:2},{x:7,y:3},{x:7,y:4},{x:6,y:4},{x:5,y:4},{x:4,y:4}],
         branchB: [{x:3,y:1},{x:3,y:2},{x:2,y:2},{x:1,y:2},{x:0,y:2},{x:0,y:3},{x:0,y:4},{x:1,y:4},{x:2,y:4},{x:3,y:4},{x:4,y:4}],
         shared_end: [{x:4,y:5},{x:4,y:6},{x:4,y:7},{x:5,y:7},{x:6,y:7},{x:7,y:7},{x:7,y:8},{x:7,y:9}],
-        rounds: [
-            { round: 1, waves: [e('tamago', 6), e('salmon', 4)], spawnInterval: 1650 },
-            { round: 2, waves: [e('salmon', 5), e('squid', 4)], spawnInterval: 1525 },
-            { round: 3, waves: [e('squid', 4), e('shrimp', 3), e('tuna', 3)], spawnInterval: 1325 },
-            { round: 4, waves: [e('shrimp', 5), e('tuna', 4), e('mackerel', 3)], spawnInterval: 1225 },
-            { round: 5, waves: [e('mackerel', 4), e('scallop', 3), e('salmon', 4)], spawnInterval: 1125 },
-            { round: 6, waves: [e('scallop', 4), e('ikura', 3), e('tuna', 4)], spawnInterval: 1025 },
-            { round: 7, waves: [e('ikura', 3), e('uni', 3), e('mackerel', 4)], spawnInterval: 925 },
-            { round: 8, waves: [e('wagyu', 2), e('uni', 3), e('ikura', 4)], spawnInterval: 825 },
-            { round: 9, waves: [e('ikura', 4), e('uni', 3), e('mackerel', 5)], spawnInterval: 780 },
-            { round: 10, waves: [e('wagyu', 2), e('uni', 4), e('scallop', 4), e('ikura', 3)], spawnInterval: 720 },
-        ],
+        rounds: SHARED_ROUNDS,
     },
     {
         id: 'spiral', name: 'The Spiral',
@@ -134,18 +135,7 @@ export const MAP_DEFINITIONS = [
             {x:3,y:2},{x:4,y:2},
             {x:4,y:3},
         ],
-        rounds: [
-            { round: 1, waves: [e('squid', 4), e('shrimp', 4)], spawnInterval: 1600 },
-            { round: 2, waves: [e('tuna', 4), e('mackerel', 3), e('squid', 3)], spawnInterval: 1400 },
-            { round: 3, waves: [e('mackerel', 4), e('scallop', 3), e('shrimp', 3)], spawnInterval: 1200 },
-            { round: 4, waves: [e('scallop', 3), e('ikura', 3), e('tuna', 5)], spawnInterval: 990 },
-            { round: 5, waves: [e('uni', 3), e('ikura', 3), e('mackerel', 4)], spawnInterval: 900 },
-            { round: 6, waves: [e('wagyu', 2), e('uni', 3), e('scallop', 5)], spawnInterval: 810 },
-            { round: 7, waves: [e('scallop', 5), e('ikura', 3), e('tuna', 6)], spawnInterval: 870 },
-            { round: 8, waves: [e('ikura', 4), e('uni', 3), e('mackerel', 6)], spawnInterval: 780 },
-            { round: 9, waves: [e('uni', 3), e('wagyu', 2), e('ikura', 5), e('scallop', 4)], spawnInterval: 720 },
-            { round: 10, waves: [e('wagyu', 3), e('uni', 3), e('ikura', 5), e('mackerel', 5)], spawnInterval: 640 },
-        ],
+        rounds: SHARED_ROUNDS,
     },
     {
         id: 'cross', name: 'The Crossroads',
@@ -164,18 +154,7 @@ export const MAP_DEFINITIONS = [
             {x:0,y:5},{x:0,y:6},{x:0,y:7},{x:0,y:8},{x:0,y:9},
         ],
         crossCell: {x:4,y:4},
-        rounds: [
-            { round: 1, waves: [e('salmon', 4), e('shrimp', 4), e('squid', 2)], spawnInterval: 1580 },
-            { round: 2, waves: [e('tuna', 3), e('mackerel', 3), e('squid', 3)], spawnInterval: 1360 },
-            { round: 3, waves: [e('scallop', 3), e('ikura', 2), e('mackerel', 4)], spawnInterval: 1250 },
-            { round: 4, waves: [e('ikura', 3), e('uni', 2), e('scallop', 4)], spawnInterval: 1140 },
-            { round: 5, waves: [e('uni', 2), e('wagyu', 2), e('ikura', 4)], spawnInterval: 1040 },
-            { round: 6, waves: [e('wagyu', 2), e('uni', 3), e('ikura', 4)], spawnInterval: 920 },
-            { round: 7, waves: [e('scallop', 4), e('ikura', 2), e('tuna', 5)], spawnInterval: 1100 },
-            { round: 8, waves: [e('ikura', 3), e('uni', 3), e('mackerel', 4)], spawnInterval: 1020 },
-            { round: 9, waves: [e('uni', 3), e('wagyu', 2), e('scallop', 3), e('ikura', 3)], spawnInterval: 950 },
-            { round: 10, waves: [e('wagyu', 2), e('uni', 3), e('ikura', 5)], spawnInterval: 860 },
-        ],
+        rounds: SHARED_ROUNDS,
     },
 ];
 
@@ -316,7 +295,7 @@ export class MapContext {
 
 // Backward-compatible exports
 export const MAP_PATH = KAITEN_PATH;
-export const ROUND_DATA = KAITEN_ROUNDS;
+export const ROUND_DATA = SHARED_ROUNDS;
 export const TEST_ROUND_DATA = [
     { round: 1, waves: [e('tamago', 3), e('salmon', 3), e('squid', 3), e('shrimp', 3)], spawnInterval: 1200 },
     { round: 2, waves: [e('tuna', 3), e('mackerel', 3), e('scallop', 3), e('ikura', 3)], spawnInterval: 1200 },

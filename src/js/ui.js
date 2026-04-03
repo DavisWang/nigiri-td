@@ -519,8 +519,14 @@ function renderSelectedInfo(ctx, game, m) {
     ctx.textAlign = 'left';
     ctx.textBaseline = 'top';
     ctx.fillText(tower.typeData.name, x + 50, cy);
-    drawTierStars(ctx, x + 50, cy + 16, tower.tier);
-    cy += 30;
+    {
+        const starGap = 14;
+        const starOuterR = 5;
+        const maxStars = 3;
+        const firstStarCx = x + w - pad - ((maxStars - 1) * starGap + starOuterR);
+        drawTierStars(ctx, firstStarCx, y + pad + 8, tower.tier);
+    }
+    cy += 20;
 
     const buffed = tower.getBuffedStats(game.towers);
     ctx.font = m.fontSelStat;
@@ -659,8 +665,8 @@ function renderPlacingInfo(ctx, game, m) {
     }
 }
 
-export function getStartWaveBtn(game, vp) {
-    if (game.phase !== 'prep') return null;
+/** Same screen slot: Start Wave (prep) or Pause / Resume (active wave). */
+function getSidebarPhaseBtnRect(vp) {
     const m = getSidebarMetrics(vp.compactSidebar);
     let startBtnY = m.startBtnY;
     let startBtnH = m.startBtnH;
@@ -674,6 +680,22 @@ export function getStartWaveBtn(game, vp) {
         w: SIDEBAR_WIDTH - 24,
         h: startBtnH,
     };
+}
+
+export function getStartWaveBtn(game, vp) {
+    if (game.phase !== 'prep') return null;
+    return getSidebarPhaseBtnRect(vp);
+}
+
+export function getPauseBtn(game, vp) {
+    if (game.phase !== 'wave' || game.gameOver || game.victory) return null;
+    return getSidebarPhaseBtnRect(vp);
+}
+
+export function hitPauseSidebarBtn(game, px, py, vp) {
+    const b = getPauseBtn(game, vp);
+    if (!b) return false;
+    return px >= b.x && px <= b.x + b.w && py >= b.y && py <= b.y + b.h;
 }
 
 const SCREEN_BACK_BTN_R = 22;
@@ -720,10 +742,20 @@ export function renderTitleMenuBtn(ctx, game, mouseX, mouseY) {
 }
 
 export function renderStartWaveBtn(ctx, game, vp) {
-    if (game.phase !== 'prep') return;
-    const btn = getStartWaveBtn(game, vp);
-    const label = vp.touchHandheld ? 'Start Wave' : 'Start Wave [Space]';
-    drawButton(ctx, btn.x, btn.y, btn.w, btn.h, label, '#E74C3C', true);
+    const prepBtn = getStartWaveBtn(game, vp);
+    if (prepBtn) {
+        const label = vp.touchHandheld ? 'Start Wave' : 'Start Wave [Space]';
+        drawButton(ctx, prepBtn.x, prepBtn.y, prepBtn.w, prepBtn.h, label, '#E74C3C', true);
+        return;
+    }
+    const pauseBtn = getPauseBtn(game, vp);
+    if (pauseBtn) {
+        const label = game.paused
+            ? (vp.touchHandheld ? 'Resume' : 'Resume [P]')
+            : (vp.touchHandheld ? 'Pause' : 'Pause [P]');
+        const color = game.paused ? '#3498DB' : '#F39C12';
+        drawButton(ctx, pauseBtn.x, pauseBtn.y, pauseBtn.w, pauseBtn.h, label, color, true);
+    }
 }
 
 export function handleGameClick(game, clickX, clickY, input, vp) {
@@ -759,6 +791,13 @@ export function handleGameClick(game, clickX, clickY, input, vp) {
     if (swBtn && hitTest(clickX, clickY, swBtn)) {
         if (game.audio) game.audio.playClick();
         game.startWave();
+        return;
+    }
+
+    const pauseBtn = getPauseBtn(game, vp);
+    if (pauseBtn && hitTest(clickX, clickY, pauseBtn)) {
+        if (game.audio) game.audio.playClick();
+        game.paused = true;
         return;
     }
 
@@ -822,7 +861,14 @@ export function renderAudioToggle(ctx, audio, mouseX, mouseY) {
     drawSpeakerIcon(ctx, b.x + b.w / 2, b.y + b.h / 2, iconR, audio.muted, hover);
 }
 
+export function hitPauseResumeBtn(game, px, py) {
+    const b = game._pauseResumeBtn;
+    if (!b) return false;
+    return px >= b.x && px <= b.x + b.w && py >= b.y && py <= b.y + b.h;
+}
+
 export function renderOverlay(ctx, game) {
+    game._pauseResumeBtn = null;
     if (game.gameOver) {
         ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
         ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
@@ -881,5 +927,28 @@ export function renderOverlay(ctx, game) {
         game._retryBtn = drawButton(ctx,
             CANVAS_WIDTH / 2 - 80, CANVAS_HEIGHT / 2 + 90,
             160, 40, 'Back to Title', '#4CAF50', true);
+    }
+
+    if (game.paused && !game.gameOver && !game.victory) {
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.45)';
+        ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+
+        ctx.fillStyle = '#FFFFFF';
+        ctx.font = `bold 44px 'Arial Rounded MT Bold', sans-serif`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.strokeStyle = '#333';
+        ctx.lineWidth = 3;
+        ctx.strokeText('Paused', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 - 28);
+        ctx.fillText('Paused', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 - 28);
+
+        ctx.font = `16px 'Arial Rounded MT Bold', sans-serif`;
+        ctx.lineWidth = 1;
+        ctx.fillStyle = '#EEE';
+        ctx.fillText('[P] or Esc to resume', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 14);
+
+        game._pauseResumeBtn = drawButton(ctx,
+            CANVAS_WIDTH / 2 - 80, CANVAS_HEIGHT / 2 + 44,
+            160, 40, 'Resume', '#3498DB', true);
     }
 }

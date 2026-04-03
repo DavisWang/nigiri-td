@@ -35,6 +35,7 @@ export class GameState {
         this.placingTowerId = null;
         this.gameOver = false;
         this.victory = false;
+        this.paused = false;
         this.towerGrid = Array.from({ length: GRID_ROWS }, () => Array(GRID_COLS).fill(null));
         this.totalEaten = 0;
         this.totalEarned = 0;

@@ -8,7 +8,7 @@ import { AudioManager } from './audio.js';
 import {
     renderGame, renderStartWaveBtn, renderTitleMenuBtn, renderOverlay,
     handleGameClick, renderAudioToggle, getAudioBtnRect, hitTitleMenuBtn,
-    hitScreenBackButton, renderScreenBackButton,
+    hitScreenBackButton, renderScreenBackButton, hitPauseResumeBtn, hitPauseSidebarBtn,
 } from './ui.js';
 import {
     drawTower, drawButton, drawNigiri, drawBeltTile,
@@ -263,7 +263,9 @@ function update(dt) {
             startBgmIfUnmuted();
         }
     } else if (screen === 'gameplay') {
-        game.update(dt);
+        if (!game.paused) {
+            game.update(dt);
+        }
 
         const click = input.consumeClick();
         if (click) {
@@ -280,6 +282,18 @@ function update(dt) {
                         startBgmIfUnmuted();
                     }
                 }
+            } else if (game.paused) {
+                const vpPaused = getViewportState();
+                if (hitTitleMenuBtn(click.x, click.y, game)) {
+                    audio.playClick();
+                    screen = 'title';
+                    game.reset();
+                    startBgmIfUnmuted();
+                } else if (hitPauseResumeBtn(game, click.x, click.y) ||
+                    hitPauseSidebarBtn(game, click.x, click.y, vpPaused)) {
+                    audio.playClick();
+                    game.paused = false;
+                }
             } else {
                 if (hitTitleMenuBtn(click.x, click.y, game)) {
                     audio.playClick();
@@ -292,16 +306,26 @@ function update(dt) {
             }
         }
 
-        if (input.wasKeyPressed(' ')) game.startWave();
+        if (input.wasKeyPressed('p') || input.wasKeyPressed('P')) {
+            if (!game.gameOver && !game.victory) {
+                game.paused = !game.paused;
+            }
+        }
+        if (input.wasKeyPressed(' ') && !game.paused) game.startWave();
         if (input.wasKeyPressed('Escape')) {
-            if (game.placingTowerId) game.placingTowerId = null;
-            else game.selectedTower = null;
+            if (game.paused) {
+                game.paused = false;
+            } else if (game.placingTowerId) {
+                game.placingTowerId = null;
+            } else {
+                game.selectedTower = null;
+            }
         }
         if (input.wasKeyPressed('u') || input.wasKeyPressed('U')) {
-            if (game.selectedTower) game.upgradeTower(game.selectedTower);
+            if (!game.paused && game.selectedTower) game.upgradeTower(game.selectedTower);
         }
         if (input.wasKeyPressed('s') || input.wasKeyPressed('S')) {
-            if (game.selectedTower) game.sellTower(game.selectedTower);
+            if (!game.paused && game.selectedTower) game.sellTower(game.selectedTower);
         }
         if (input.wasKeyPressed('m') || input.wasKeyPressed('M')) {
             audio._ensureContext();
@@ -439,8 +463,8 @@ function render() {
         const vp = getViewportState();
         renderGame(ctx, game, input, vp);
         renderTitleMenuBtn(ctx, game, input.mouseX, input.mouseY);
-        renderStartWaveBtn(ctx, game, vp);
         renderOverlay(ctx, game);
+        renderStartWaveBtn(ctx, game, vp);
     }
 
     renderAudioToggle(ctx, audio, input.mouseX, input.mouseY);
