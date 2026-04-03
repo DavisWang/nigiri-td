@@ -19,14 +19,15 @@ You run a conveyor-belt sushi restaurant where the sushi is trying to escape. Se
 1. **Prep phase** — the round has not started. Player reviews the upcoming wave preview (nigiri types and counts), places or upgrades towers, sells unwanted towers.
 2. **Wave phase** — nigiri plates spawn at the entry and travel the conveyor belt toward the exit. Towers in range automatically attack (eat) passing plates.
 3. **Resolution** — when all plates in the wave are eaten or have exited: award money for eaten plates, deduct life for escaped plates, grant round bonus, show round-end summary.
-4. **Progression** — if life > 0 and rounds remain, return to prep phase. If life ≤ 0, trigger game over. If all 10 rounds are cleared, trigger victory.
+4. **Progression** — if life > 0 and rounds remain, return to prep phase. If life ≤ 0, trigger game over. If all 10 campaign rounds are cleared, show a **victory offer** (continue infinite or end run).
 
 ## Win and Loss Conditions
 
-- **Win**: Clear all 10 rounds with life > 0.
+- **Campaign complete**: Clear all **10** rounds with life > 0. The player then chooses **End Run (Victory)** or **Continue · Infinite**.
+- **Victory (end run)**: Confirms the 10-round clear; show stats and **Back to Title** (same overlay style as before).
+- **Infinite mode**: No final win — waves keep coming with per-round scaling (HP, speed, kill money, spawn density, occasional +1 spawn, round bonus). Implementation: `phase === 'victory_offer'`, `infiniteMode`, helpers in `src/js/data.js` (`getInfiniteHpMult`, `buildInfiniteRoundData`, etc.).
 - **Lose**: Life reaches 0 at any point during a wave.
-- **Game over screen**: Show rounds survived, total nigiri eaten, and a "Try Again" button that returns to the title screen.
-- **Victory screen**: Show completion stats (nigiri eaten, money earned, life remaining) and a "Back to Title" button.
+- **Game over screen**: Show rounds survived (includes completed infinite rounds), total nigiri eaten, and **Try Again** → title.
 
 ## Controls
 
@@ -54,7 +55,9 @@ You run a conveyor-belt sushi restaurant where the sushi is trying to escape. Se
 - **Right sidebar**: Current life (hearts or bar), current money, round counter ("Round 3/10"), tower shop list (icon + name + cost), selected tower info panel (stats, upgrade cost, sell value)
 - **Top bar** (within game area or above): Wave preview showing incoming nigiri types before the wave starts, Start Wave button
 - **Game over overlay**: Drawn on canvas over the game area
-- **Victory overlay**: Drawn on canvas over the game area
+- **Victory offer overlay**: After round 10 — short copy, **Continue · Infinite**, **End Run (Victory)**.
+- **Victory overlay**: Drawn on canvas when the player ends the run after clearing 10 rounds.
+- **Game over overlay**: Unchanged.
 
 ---
 

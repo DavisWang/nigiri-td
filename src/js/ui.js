@@ -354,7 +354,11 @@ function renderRoundInfo(ctx, game, m) {
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     const totalRounds = game._roundData.length;
-    ctx.fillText(`Round ${Math.min(game.round + 1, totalRounds)} / ${totalRounds}`, x, y);
+    if (game.infiniteMode && game.round >= totalRounds) {
+        ctx.fillText(`Round ${10 + game.infiniteRound} · ∞`, x, y);
+    } else {
+        ctx.fillText(`Round ${Math.min(game.round + 1, totalRounds)} / ${totalRounds}`, x, y);
+    }
 }
 
 function renderWavePreview(ctx, game, m) {
@@ -688,7 +692,7 @@ export function getStartWaveBtn(game, vp) {
 }
 
 export function getPauseBtn(game, vp) {
-    if (game.phase !== 'wave' || game.gameOver || game.victory) return null;
+    if (game.phase !== 'wave' || game.gameOver || game.victory || game.phase === 'victory_offer') return null;
     return getSidebarPhaseBtnRect(vp);
 }
 
@@ -727,7 +731,7 @@ export function renderScreenBackButton(ctx, mouseX, mouseY) {
 
 /** Gameplay only: hidden during end-game overlays. */
 export function getTitleMenuBtn(game) {
-    if (game.gameOver || game.victory) return null;
+    if (game.gameOver || game.victory || game.phase === 'victory_offer') return null;
     return getScreenBackButton();
 }
 
@@ -869,6 +873,36 @@ export function hitPauseResumeBtn(game, px, py) {
 
 export function renderOverlay(ctx, game) {
     game._pauseResumeBtn = null;
+    game._continueInfiniteBtn = null;
+    game._declineInfiniteBtn = null;
+
+    if (game.phase === 'victory_offer') {
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.55)';
+        ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+
+        ctx.fillStyle = '#F1C40F';
+        ctx.font = `bold 36px 'Arial Rounded MT Bold', sans-serif`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.strokeStyle = '#333';
+        ctx.lineWidth = 2;
+        ctx.strokeText('All 10 rounds cleared!', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 - 100);
+        ctx.fillText('All 10 rounds cleared!', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 - 100);
+
+        ctx.fillStyle = '#EEE';
+        ctx.font = `15px 'Arial Rounded MT Bold', sans-serif`;
+        ctx.lineWidth = 1;
+        ctx.fillText('Infinite mode: enemies scale each round. There is no final wave.', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 - 58);
+        ctx.fillText('How far can you go?', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 - 34);
+
+        game._continueInfiniteBtn = drawButton(ctx,
+            CANVAS_WIDTH / 2 - 130, CANVAS_HEIGHT / 2 + 8,
+            260, 44, 'Continue · Infinite', '#9B59B6', true);
+        game._declineInfiniteBtn = drawButton(ctx,
+            CANVAS_WIDTH / 2 - 130, CANVAS_HEIGHT / 2 + 62,
+            260, 40, 'End Run (Victory)', '#4CAF50', true);
+    }
+
     if (game.gameOver) {
         ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
         ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
@@ -884,7 +918,7 @@ export function renderOverlay(ctx, game) {
 
         ctx.fillStyle = '#FFFFFF';
         ctx.font = `18px 'Arial Rounded MT Bold', sans-serif`;
-        ctx.fillText(`Rounds Survived: ${game.round}`, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2);
+        ctx.fillText(`Rounds Survived: ${game.getRoundsSurvived()}`, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2);
         ctx.fillText(`Nigiri Eaten: ${game.totalEaten}`, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 30);
 
         game._retryBtn = drawButton(ctx,
@@ -929,7 +963,7 @@ export function renderOverlay(ctx, game) {
             160, 40, 'Back to Title', '#4CAF50', true);
     }
 
-    if (game.paused && !game.gameOver && !game.victory) {
+    if (game.paused && !game.gameOver && !game.victory && game.phase !== 'victory_offer') {
         ctx.fillStyle = 'rgba(0, 0, 0, 0.45)';
         ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 

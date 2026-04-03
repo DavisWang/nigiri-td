@@ -27,7 +27,7 @@ Nigiri TD now has face-only kawaii tower sprites filling ~52-56px of their 64px 
 | Targeting mode toggle | First/Last/Strongest adds strategy | Low — logic + small UI change |
 | More maps | Additional belt layouts via `MAP_DEFINITIONS` | Low — content-first |
 | Mid-run path change | e.g. gate opens, shortcut activates (removed “Belt Switch” map) | Medium — needs dynamic path state + UI again |
-| Endless/survival mode | Post-round-10 content for replay depth | Medium — wave scaling, balance |
+| ~~Endless/survival mode~~ | **Shipped:** infinite mode after round 10 (`victory_offer` → scaling waves) | — |
 
 ## Deferred Questions
 

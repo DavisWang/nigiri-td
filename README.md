@@ -42,7 +42,7 @@ npm install
 npm test
 ```
 
-Tests are Node-based checks for map paths, belt tile orientation, and sidebar layout (no browser required).
+Tests are Node-based checks for map paths, belt tile orientation, sidebar layout, round ladder, and **infinite-mode** scalers / wave template (no browser required).
 
 ## Project layout
 
@@ -51,7 +51,7 @@ Tests are Node-based checks for map paths, belt tile orientation, and sidebar la
 | `src/index.html` | Entry page, mobile viewport meta, canvas |
 | `src/js/main.js` | Title, how-to, map & difficulty flow, loop |
 | `src/js/input.js` | Pointer + touch/mouse input |
-| `src/js/game.js` | Rounds, waves, economy, difficulty multipliers |
+| `src/js/game.js` | Rounds, waves, economy, difficulty multipliers, infinite mode |
 | `src/js/data.js` | Maps, towers, enemies, `DIFFICULTY_PROFILES` |
 | `src/js/ui.js` | HUD, shop, overlays, back button |
 | `src/js/sprites.js` | Canvas drawing |

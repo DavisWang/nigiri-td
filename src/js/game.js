@@ -3,6 +3,8 @@ import {
     GRID_COLS, GRID_ROWS,
     getTotalCost, getSellValue, getUpgradeCost, getRoundBonus, buildSpawnQueue,
     MapContext, getMapById, getDifficultyProfile,
+    buildInfiniteRoundData, getInfiniteHpMult, getInfiniteSpeedMult, getInfiniteMoneyMult,
+    getInfiniteSpawnIntervalMult, getInfiniteRoundBonus,
 } from './data.js';
 import { Tower, EnemySpawner } from './entities.js';
 import { EffectManager } from './effects.js';
@@ -35,6 +37,8 @@ export class GameState {
         this.placingTowerId = null;
         this.gameOver = false;
         this.victory = false;
+        this.infiniteMode = false;
+        this.infiniteRound = 1;
         this.paused = false;
         this.towerGrid = Array.from({ length: GRID_ROWS }, () => Array(GRID_COLS).fill(null));
         this.totalEaten = 0;
@@ -95,6 +99,27 @@ export class GameState {
 
     startWave() {
         if (this.phase !== 'prep') return;
+
+        if (this.infiniteMode && this.round >= this._roundData.length) {
+            const k = this.infiniteRound;
+            const roundData = buildInfiniteRoundData(this._roundData, k);
+            const queue = buildSpawnQueue(roundData);
+            const pathProvider = () => this.mapCtx.getEnemyPath();
+            const intMult = this.spawnIntervalMult * getInfiniteSpawnIntervalMult(k);
+            const interval = Math.max(120, Math.round(roundData.spawnInterval * intMult));
+            const hpComposite = this.hpMult * getInfiniteHpMult(k);
+            this.spawner = new EnemySpawner(
+                queue, interval, pathProvider, hpComposite,
+                getInfiniteSpeedMult(k), getInfiniteMoneyMult(k),
+            );
+            this.phase = 'wave';
+            this.roundEaten = 0;
+            this.roundEarned = 0;
+            this.effects.addBanner(`Round ${10 + k} · Infinite`);
+            if (this.audio) this.audio.playWaveStart();
+            return;
+        }
+
         if (this.round >= this._roundData.length) return;
 
         const roundData = this._roundData[this.round];
@@ -184,6 +209,23 @@ export class GameState {
     }
 
     _endRound() {
+        if (this.infiniteMode && this.round >= this._roundData.length) {
+            const k = this.infiniteRound;
+            const bonus = getInfiniteRoundBonus(k);
+            this.money += bonus;
+            this.totalEarned += bonus;
+            this.infiniteRound++;
+
+            for (const tower of this.towers) {
+                tower.attackAnimTimer = 0;
+            }
+
+            this.effects.addBanner(`Round Complete! +${bonus} bonus`);
+            this.phase = 'prep';
+            if (this.audio) this.audio.playRoundComplete();
+            return;
+        }
+
         const bonus = getRoundBonus(this.round + 1);
         this.money += bonus;
         this.totalEarned += bonus;
@@ -196,16 +238,50 @@ export class GameState {
         this.effects.addBanner(`Round Complete! +${bonus} bonus`);
 
         if (this.round >= this._roundData.length) {
-            this.victory = true;
-            this.phase = 'victory';
-            if (this.audio) { this.audio.stopBGM(); this.audio.playVictory(); }
+            if (!this.testMode) {
+                this.phase = 'victory_offer';
+                if (this.audio) { this.audio.stopBGM(); this.audio.playVictory(); }
+            } else {
+                this.victory = true;
+                this.phase = 'victory';
+                if (this.audio) { this.audio.stopBGM(); this.audio.playVictory(); }
+            }
         } else {
             this.phase = 'prep';
             if (this.audio) this.audio.playRoundComplete();
         }
     }
 
+    /** After clearing round 10: continue scaling waves (no win condition). */
+    enterInfiniteMode() {
+        this.infiniteMode = true;
+        this.infiniteRound = 1;
+        this.phase = 'prep';
+        this.victory = false;
+    }
+
+    /** Treat campaign as won; show normal victory overlay. */
+    declineInfiniteMode() {
+        this.victory = true;
+        this.phase = 'victory';
+    }
+
+    /** Full rounds cleared before game over (campaign index, or 10 + infinite completed). */
+    getRoundsSurvived() {
+        if (this.gameOver && this.infiniteMode) {
+            return 10 + (this.infiniteRound - 1);
+        }
+        return this.round;
+    }
+
     getWavePreview() {
+        if (this.infiniteMode && this.round >= this._roundData.length) {
+            const rd = buildInfiniteRoundData(this._roundData, this.infiniteRound);
+            return rd.waves.map((w) => {
+                const ed = ENEMY_DATA.find((e) => e.id === w.id);
+                return { data: ed, count: w.count };
+            });
+        }
         if (this.round >= this._roundData.length) return [];
         const rd = this._roundData[this.round];
         return rd.waves.map(w => {

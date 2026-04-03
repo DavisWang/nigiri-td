@@ -271,7 +271,20 @@ function update(dt) {
         if (click) {
             if (handleAudioToggleClick(click)) return;
 
-            if (game.gameOver || game.victory) {
+            if (game.phase === 'victory_offer') {
+                const c = game._continueInfiniteBtn;
+                const d = game._declineInfiniteBtn;
+                if (c && click.x >= c.x && click.x <= c.x + c.w &&
+                    click.y >= c.y && click.y <= c.y + c.h) {
+                    audio.playClick();
+                    game.enterInfiniteMode();
+                    startBgmIfUnmuted();
+                } else if (d && click.x >= d.x && click.x <= d.x + d.w &&
+                    click.y >= d.y && click.y <= d.y + d.h) {
+                    audio.playClick();
+                    game.declineInfiniteMode();
+                }
+            } else if (game.gameOver || game.victory) {
                 if (game._retryBtn) {
                     const b = game._retryBtn;
                     if (click.x >= b.x && click.x <= b.x + b.w &&
@@ -307,13 +320,15 @@ function update(dt) {
         }
 
         if (input.wasKeyPressed('p') || input.wasKeyPressed('P')) {
-            if (!game.gameOver && !game.victory) {
+            if (!game.gameOver && !game.victory && game.phase !== 'victory_offer') {
                 game.paused = !game.paused;
             }
         }
-        if (input.wasKeyPressed(' ') && !game.paused) game.startWave();
+        if (input.wasKeyPressed(' ') && !game.paused && game.phase !== 'victory_offer') game.startWave();
         if (input.wasKeyPressed('Escape')) {
-            if (game.paused) {
+            if (game.phase === 'victory_offer') {
+                /* ignore — choose with buttons */
+            } else if (game.paused) {
                 game.paused = false;
             } else if (game.placingTowerId) {
                 game.placingTowerId = null;

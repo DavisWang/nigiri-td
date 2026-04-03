@@ -326,6 +326,51 @@ export function getSellValue(towerData, tier) { return Math.floor(getTotalCost(t
 export function getUpgradeCost(towerData, tier) { return tier >= 2 ? null : towerData.tiers[tier + 1].cost; }
 export function getRoundBonus(roundNum) { return 30 + roundNum * 7; }
 
+/** 0-based index of the last campaign round used as the infinite-mode wave template. */
+export const INFINITE_TEMPLATE_ROUND_INDEX = 9;
+
+export function getInfiniteHpMult(k) {
+    if (k < 1) return 1;
+    return 1.06 ** (k - 1);
+}
+
+export function getInfiniteSpeedMult(k) {
+    if (k < 1) return 1;
+    return Math.min(1.28, 1 + 0.015 * (k - 1));
+}
+
+export function getInfiniteMoneyMult(k) {
+    if (k < 1) return 1;
+    return Math.max(0.4, 0.93 ** (k - 1));
+}
+
+export function getInfiniteSpawnIntervalMult(k) {
+    if (k < 1) return 1;
+    return Math.max(0.65, 0.985 ** (k - 1));
+}
+
+/** k = infinite round just completed (1-based). */
+export function getInfiniteRoundBonus(k) {
+    return getRoundBonus(10) + 5 * (k - 1);
+}
+
+/**
+ * Clone the template round; every 3rd infinite round (k % 3 === 0) adds +1 to the highest-count wave.
+ */
+export function buildInfiniteRoundData(rounds, k) {
+    const idx = Math.min(INFINITE_TEMPLATE_ROUND_INDEX, Math.max(0, rounds.length - 1));
+    const template = rounds[idx];
+    if (!template) return { waves: [], spawnInterval: 780 };
+    const waves = template.waves.map((w) => ({ id: w.id, count: w.count }));
+    if (k > 0 && k % 3 === 0) {
+        let maxC = -1;
+        for (const w of waves) maxC = Math.max(maxC, w.count);
+        const idx = waves.findIndex((w) => w.count === maxC);
+        if (idx >= 0) waves[idx].count += 1;
+    }
+    return { waves, spawnInterval: template.spawnInterval };
+}
+
 export function buildSpawnQueue(roundData) {
     const queue = [];
     for (const w of roundData.waves) {

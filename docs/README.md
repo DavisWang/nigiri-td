@@ -4,7 +4,7 @@
 
 | Document | Contents |
 | --- | --- |
-| [PLAYING.md](PLAYING.md) | Screens, **desktop + touch** controls, difficulty modes, audio, mobile notes |
+| [PLAYING.md](PLAYING.md) | Screens, **desktop + touch** controls, difficulty, **infinite mode**, audio, mobile notes |
 
 ## Design & planning (`project/`)
 
