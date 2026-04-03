@@ -21,10 +21,34 @@ const ctx = canvas.getContext('2d');
 canvas.width = CANVAS_WIDTH;
 canvas.height = CANVAS_HEIGHT;
 
+/**
+ * Landscape: height-limits scale — use standard sidebar density so the shop fits.
+ * Portrait phone: compact sidebar + larger type. iPad: shortSide > 540 → desktop sidebar.
+ */
+function getViewportState() {
+    try {
+        const vw = window.visualViewport?.width ?? window.innerWidth;
+        const vh = window.visualViewport?.height ?? window.innerHeight;
+        const shortSide = Math.min(vw, vh);
+        const landscape = vw > vh;
+        const coarse = window.matchMedia('(pointer: coarse)').matches;
+        return {
+            landscape,
+            touchHandheld: coarse && shortSide <= 900,
+            compactSidebar: coarse && shortSide <= 540 && !landscape,
+        };
+    } catch {
+        return { landscape: false, touchHandheld: false, compactSidebar: false };
+    }
+}
+
 function fitCanvas() {
-    const pad = 16;
     const vw = window.visualViewport?.width ?? window.innerWidth;
     const vh = window.visualViewport?.height ?? window.innerHeight;
+    const landscape = vw > vh;
+    const coarse = typeof matchMedia !== 'undefined' && matchMedia('(pointer: coarse)').matches;
+    let pad = 16;
+    if (coarse) pad = landscape ? 2 : 6;
     const scaleX = (vw - pad) / CANVAS_WIDTH;
     const scaleY = (vh - pad) / CANVAS_HEIGHT;
     const scale = Math.min(scaleX, scaleY, 2);
@@ -263,7 +287,7 @@ function update(dt) {
                     game.reset();
                     startBgmIfUnmuted();
                 } else {
-                    handleGameClick(game, click.x, click.y, input);
+                    handleGameClick(game, click.x, click.y, input, getViewportState());
                 }
             }
         }
@@ -412,9 +436,10 @@ function render() {
         renderDifficultySelect();
         renderScreenBackButton(ctx, input.mouseX, input.mouseY);
     } else if (screen === 'gameplay') {
-        renderGame(ctx, game, input);
+        const vp = getViewportState();
+        renderGame(ctx, game, input, vp);
         renderTitleMenuBtn(ctx, game, input.mouseX, input.mouseY);
-        renderStartWaveBtn(ctx, game);
+        renderStartWaveBtn(ctx, game, vp);
         renderOverlay(ctx, game);
     }
 

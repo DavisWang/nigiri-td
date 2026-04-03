@@ -25,10 +25,13 @@ npm run serve
 The UI is **tap-driven** on iPhone and iPad:
 
 - **Pointer Events** unify mouse and touch; older browsers use a **touch + mouse** fallback on the canvas.
-- The canvas uses **`touch-action: none`** and safe-area padding so the page doesn’t steal scroll/zoom from gameplay.
-- **Resize / orientation / visual viewport** updates keep the 960×640 logical canvas scaled to the screen.
+- The canvas uses **`touch-action: none`**, **`overscroll-behavior: none`**, and safe-area padding so the page doesn’t steal scroll/zoom from gameplay. **`touch-action: manipulation`** on the document reduces tap delay where supported.
+- **Resize / orientation / visual viewport** updates keep the 960×640 logical canvas scaled to the screen (`fitCanvas` in `main.js`).
+- **Portrait phones** (coarse pointer, short side ≤ 540px): **compact sidebar** in gameplay—larger type, taller shop rows, and bigger Start Wave / upgrade controls so the panel stays readable when width limits scale.
+- **Landscape phones**: standard (desktop-density) sidebar so the shop and bottom panels fit the fixed canvas height; slightly larger Start Wave, audio control, and back affordances for touch.
+- **Tablets (e.g. iPad)**: short side > 540px uses the same sidebar density as desktop; touch still gets plain **Start Wave** (no `[Space]` in the label) where coarse pointer is detected.
 
-**Safari:** After choosing **unmute**, sound uses Web Audio (requires a user gesture—your first tap is enough).
+**Safari:** After choosing **unmute**, sound uses Web Audio (requires a user gesture—your first tap is enough). **`100dvh`** / **`-webkit-fill-available`** help the page fill the screen when the URL bar shows or hides.
 
 Full player-oriented notes: [docs/PLAYING.md](docs/PLAYING.md).
 
@@ -87,18 +90,3 @@ See [LICENSE](LICENSE) (ISC).
 **By Pwner Studios** (in-game attribution).
 
 ---
-
-### Push to GitHub
-
-Remote: `https://github.com/DavisWang/nigiri-td.git`
-
-```bash
-git add -A
-git status
-git commit -m "Describe your changes"
-git push -u origin main
-```
-
-If the default branch differs or the remote has commits, use `git pull origin main --rebase` before the first push, or merge as GitHub suggests.
-
-If [the repo](https://github.com/DavisWang/nigiri-td) was empty, a normal push after `git remote add origin …` is enough.

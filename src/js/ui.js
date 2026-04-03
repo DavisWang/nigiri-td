@@ -11,13 +11,106 @@ import {
     drawTierStars, drawSpeakerIcon,
 } from './sprites.js';
 
-const SHOP_COLS = 2;
-const SHOP_ITEM_W = 145;
-const SHOP_ITEM_H = 46;
-const SHOP_GAP = 4;
-const SHOP_START_Y = 196;
+/** Larger type + tap targets on portrait phones (width-limited scale). Landscape/tablet use `compact === false`. */
+function getSidebarMetrics(compact) {
+    if (!compact) {
+        return {
+            mapY: 10,
+            hudY: 40,
+            roundY: 72,
+            waveLabelY: 92,
+            waveRowY: 110,
+            startBtnY: 128,
+            startBtnH: 32,
+            shopStartY: 196,
+            shopCols: 2,
+            shopItemW: 145,
+            shopItemH: 46,
+            shopGap: 4,
+            coinR: 22,
+            heartR: 20,
+            heartSpacingMax: 16,
+            nigiriPreviewR: 30,
+            previewStepX: 52,
+            fontMapName: `bold 13px 'Arial Rounded MT Bold', sans-serif`,
+            fontDiff: `bold 11px 'Arial Rounded MT Bold', sans-serif`,
+            fontMoney: `bold 18px 'Arial Rounded MT Bold', sans-serif`,
+            fontLife: `bold 16px 'Arial Rounded MT Bold', sans-serif`,
+            fontRound: `bold 16px 'Arial Rounded MT Bold', sans-serif`,
+            fontWaveLabel: `12px 'Arial Rounded MT Bold', sans-serif`,
+            fontWaveCount: `11px sans-serif`,
+            fontShopTitle: `bold 13px 'Arial Rounded MT Bold', sans-serif`,
+            fontTowerName: `bold 12px 'Arial Rounded MT Bold', sans-serif`,
+            fontTowerCost: `bold 11px sans-serif`,
+            towerIconR: 38,
+            panelSelectedH: 160,
+            panelPlacingHNeed: 96,
+            panelPlacingHOk: 82,
+            fontSelTitle: `bold 14px 'Arial Rounded MT Bold', sans-serif`,
+            fontSelStat: `bold 12px sans-serif`,
+            fontSelSpecial: `bold 11px sans-serif`,
+            fontSelNext: `11px sans-serif`,
+            fontSelHint: `10px sans-serif`,
+            btnRowH: 30,
+            fontPlaceTitle: `bold 14px 'Arial Rounded MT Bold', sans-serif`,
+            fontPlaceDesc: `italic 10px sans-serif`,
+            fontPlaceStat: `bold 12px sans-serif`,
+            fontPlaceSpecial: `bold 11px sans-serif`,
+            fontPlaceNeed: `bold 10px sans-serif`,
+        };
+    }
+    const innerW = SIDEBAR_WIDTH - 24;
+    const shopGap = 5;
+    const shopCols = 2;
+    const shopItemW = Math.floor((innerW - shopGap) / 2);
+    return {
+        mapY: 10,
+        hudY: 42,
+        roundY: 66,
+        waveLabelY: 86,
+        waveRowY: 102,
+        startBtnY: 122,
+        startBtnH: 40,
+        shopStartY: 178,
+        shopCols,
+        shopItemW,
+        shopItemH: 52,
+        shopGap,
+        coinR: 26,
+        heartR: 22,
+        heartSpacingMax: 17,
+        nigiriPreviewR: 34,
+        previewStepX: 56,
+        fontMapName: `bold 15px 'Arial Rounded MT Bold', sans-serif`,
+        fontDiff: `bold 12px 'Arial Rounded MT Bold', sans-serif`,
+        fontMoney: `bold 21px 'Arial Rounded MT Bold', sans-serif`,
+        fontLife: `bold 18px 'Arial Rounded MT Bold', sans-serif`,
+        fontRound: `bold 18px 'Arial Rounded MT Bold', sans-serif`,
+        fontWaveLabel: `13px 'Arial Rounded MT Bold', sans-serif`,
+        fontWaveCount: `12px sans-serif`,
+        fontShopTitle: `bold 15px 'Arial Rounded MT Bold', sans-serif`,
+        fontTowerName: `bold 14px 'Arial Rounded MT Bold', sans-serif`,
+        fontTowerCost: `bold 12px sans-serif`,
+        towerIconR: 42,
+        panelSelectedH: 176,
+        panelPlacingHNeed: 108,
+        panelPlacingHOk: 92,
+        fontSelTitle: `bold 15px 'Arial Rounded MT Bold', sans-serif`,
+        fontSelStat: `bold 13px sans-serif`,
+        fontSelSpecial: `bold 12px sans-serif`,
+        fontSelNext: `12px sans-serif`,
+        fontSelHint: `11px sans-serif`,
+        btnRowH: 34,
+        fontPlaceTitle: `bold 15px 'Arial Rounded MT Bold', sans-serif`,
+        fontPlaceDesc: `italic 11px sans-serif`,
+        fontPlaceStat: `bold 13px sans-serif`,
+        fontPlaceSpecial: `bold 12px sans-serif`,
+        fontPlaceNeed: `bold 11px sans-serif`,
+    };
+}
 
-export function renderGame(ctx, game, input) {
+export function renderGame(ctx, game, input, vp) {
+    const m = getSidebarMetrics(vp.compactSidebar);
     ctx.fillStyle = COLORS.bg;
     ctx.fillRect(0, 0, GAME_AREA_WIDTH, CANVAS_HEIGHT);
 
@@ -27,7 +120,7 @@ export function renderGame(ctx, game, input) {
     renderSelectedOverlay(ctx, game);
     renderPlacementPreview(ctx, game, input);
     game.effects.render(ctx, GAME_AREA_WIDTH);
-    renderSidebar(ctx, game, input);
+    renderSidebar(ctx, game, input, m);
 }
 
 function renderGrid(ctx, game, input) {
@@ -163,7 +256,7 @@ function renderPlacementPreview(ctx, game, input) {
     }
 }
 
-function renderSidebar(ctx, game, input) {
+function renderSidebar(ctx, game, input, m) {
     ctx.fillStyle = COLORS.sidebarBg;
     ctx.fillRect(SIDEBAR_X, 0, SIDEBAR_WIDTH, CANVAS_HEIGHT);
     ctx.strokeStyle = COLORS.sidebarBorder;
@@ -173,40 +266,40 @@ function renderSidebar(ctx, game, input) {
     ctx.lineTo(SIDEBAR_X, CANVAS_HEIGHT);
     ctx.stroke();
 
-    renderMapInfo(ctx, game);
-    renderHUD(ctx, game);
-    renderRoundInfo(ctx, game);
-    renderWavePreview(ctx, game);
-    renderTowerShop(ctx, game, input);
-    renderSelectedInfo(ctx, game);
-    renderPlacingInfo(ctx, game);
+    renderMapInfo(ctx, game, m);
+    renderHUD(ctx, game, m);
+    renderRoundInfo(ctx, game, m);
+    renderWavePreview(ctx, game, m);
+    renderTowerShop(ctx, game, input, m);
+    renderSelectedInfo(ctx, game, m);
+    renderPlacingInfo(ctx, game, m);
 }
 
-function renderMapInfo(ctx, game) {
+function renderMapInfo(ctx, game, m) {
     const x = SIDEBAR_X + 12;
     ctx.fillStyle = COLORS.textPrimary;
-    ctx.font = `bold 13px 'Arial Rounded MT Bold', sans-serif`;
+    ctx.font = m.fontMapName;
     ctx.textAlign = 'left';
     ctx.textBaseline = 'middle';
-    ctx.fillText(game.mapCtx.def.name, x, 10);
+    ctx.fillText(game.mapCtx.def.name, x, m.mapY);
     const diff = getDifficultyProfile(game.difficultyId);
-    ctx.font = `bold 11px 'Arial Rounded MT Bold', sans-serif`;
+    ctx.font = m.fontDiff;
     ctx.fillStyle = diff.accent;
     ctx.textAlign = 'right';
-    ctx.fillText(diff.label, SIDEBAR_X + SIDEBAR_WIDTH - 12, 10);
+    ctx.fillText(diff.label, SIDEBAR_X + SIDEBAR_WIDTH - 12, m.mapY);
     ctx.textAlign = 'left';
     ctx.fillStyle = COLORS.textPrimary;
 }
 
-function renderHUD(ctx, game) {
+function renderHUD(ctx, game, m) {
     const startX = SIDEBAR_X + 12;
     const rightX = SIDEBAR_X + SIDEBAR_WIDTH - 12;
-    const rowY = 40;
+    const rowY = m.hudY;
     const minGapMoneyHearts = 10;
 
-    drawCoin(ctx, startX + 10, rowY, 22);
+    drawCoin(ctx, startX + 10, rowY, m.coinR);
     ctx.fillStyle = COLORS.money;
-    ctx.font = `bold 18px 'Arial Rounded MT Bold', sans-serif`;
+    ctx.font = m.fontMoney;
     ctx.textAlign = 'left';
     ctx.textBaseline = 'middle';
     const moneyStr = `${game.money}`;
@@ -215,10 +308,10 @@ function renderHUD(ctx, game) {
 
     const heartCount = Math.min(game.maxLife, 10);
     const heartsPerIcon = game.maxLife / heartCount;
-    const heartSize = 20;
-    let heartSpacing = 16;
+    const heartSize = m.heartR;
+    let heartSpacing = m.heartSpacingMax;
 
-    ctx.font = `bold 16px 'Arial Rounded MT Bold', sans-serif`;
+    ctx.font = m.fontLife;
     const lifeStr = `${game.life}`;
     const lifeW = ctx.measureText(lifeStr).width;
     const padBeforeLife = 8;
@@ -245,78 +338,81 @@ function renderHUD(ctx, game) {
     ctx.globalAlpha = 1.0;
 
     ctx.fillStyle = COLORS.life;
-    ctx.font = `bold 16px 'Arial Rounded MT Bold', sans-serif`;
+    ctx.font = m.fontLife;
     ctx.textAlign = 'right';
     ctx.textBaseline = 'middle';
     ctx.fillText(lifeStr, rightX, rowY);
     ctx.textAlign = 'left';
 }
 
-function renderRoundInfo(ctx, game) {
+function renderRoundInfo(ctx, game, m) {
     const x = SIDEBAR_X + SIDEBAR_WIDTH / 2;
-    const y = 72;
+    const y = m.roundY;
 
     ctx.fillStyle = COLORS.textPrimary;
-    ctx.font = `bold 16px 'Arial Rounded MT Bold', sans-serif`;
+    ctx.font = m.fontRound;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     const totalRounds = game._roundData.length;
     ctx.fillText(`Round ${Math.min(game.round + 1, totalRounds)} / ${totalRounds}`, x, y);
 }
 
-function renderWavePreview(ctx, game) {
+function renderWavePreview(ctx, game, m) {
     if (game.phase !== 'prep') return;
     const preview = game.getWavePreview();
     if (preview.length === 0) return;
 
     const startX = SIDEBAR_X + 12;
-    const y = 92;
+    const y = m.waveLabelY;
+    const nr = m.nigiriPreviewR;
+    const countOffset = Math.round(nr * 0.8);
 
     ctx.fillStyle = COLORS.textPrimary;
-    ctx.font = `12px 'Arial Rounded MT Bold', sans-serif`;
+    ctx.font = m.fontWaveLabel;
     ctx.textAlign = 'left';
     ctx.textBaseline = 'middle';
     ctx.fillText('Incoming:', startX, y);
 
     let px = startX;
-    const py = y + 18;
+    const py = m.waveRowY;
     for (const item of preview) {
-        drawNigiri(ctx, px + 10, py, 30, item.data, 1.0);
+        drawNigiri(ctx, px + 10, py, nr, item.data, 1.0);
 
         ctx.fillStyle = COLORS.textPrimary;
-        ctx.font = `11px sans-serif`;
+        ctx.font = m.fontWaveCount;
         ctx.textAlign = 'left';
         ctx.textBaseline = 'middle';
-        ctx.fillText(`×${item.count}`, px + 24, py);
-        px += 52;
-        if (px > SIDEBAR_X + SIDEBAR_WIDTH - 40) {
+        ctx.fillText(`×${item.count}`, px + countOffset, py);
+        px += m.previewStepX;
+        if (px > SIDEBAR_X + SIDEBAR_WIDTH - 36) {
             px = startX;
         }
     }
 }
 
-function renderTowerShop(ctx, game, input) {
+function renderTowerShop(ctx, game, input, m) {
     const startX = SIDEBAR_X + 12;
+    const { shopStartY: sy, shopCols, shopItemW, shopItemH, shopGap } = m;
 
     ctx.fillStyle = COLORS.textPrimary;
-    ctx.font = `bold 13px 'Arial Rounded MT Bold', sans-serif`;
+    ctx.font = m.fontShopTitle;
     ctx.textAlign = 'left';
     ctx.textBaseline = 'middle';
-    ctx.fillText('Tower Shop', startX, SHOP_START_Y - 15);
+    ctx.fillText('Tower Shop', startX, sy - 15);
 
     ctx.strokeStyle = COLORS.sidebarBorder;
     ctx.lineWidth = 0.5;
     ctx.beginPath();
-    ctx.moveTo(startX, SHOP_START_Y - 5);
-    ctx.lineTo(SIDEBAR_X + SIDEBAR_WIDTH - 12, SHOP_START_Y - 5);
+    ctx.moveTo(startX, sy - 5);
+    ctx.lineTo(SIDEBAR_X + SIDEBAR_WIDTH - 12, sy - 5);
     ctx.stroke();
 
     for (let i = 0; i < TOWER_DATA.length; i++) {
         const td = TOWER_DATA[i];
-        const col = i % SHOP_COLS;
-        const row = Math.floor(i / SHOP_COLS);
-        const x = startX + col * (SHOP_ITEM_W + SHOP_GAP);
-        const y = SHOP_START_Y + row * (SHOP_ITEM_H + SHOP_GAP);
+        const col = i % shopCols;
+        const row = Math.floor(i / shopCols);
+        const x = startX + col * (shopItemW + shopGap);
+        const y = sy + row * (shopItemH + shopGap);
         const affordable = game.testMode || game.money >= td.tiers[0].cost;
         const isSelected = game.placingTowerId === td.id;
         const showBright = affordable || isSelected;
@@ -326,7 +422,7 @@ function renderTowerShop(ctx, game, input) {
         ctx.strokeStyle = isSelected ? COLORS.money : COLORS.sidebarBorder;
         ctx.lineWidth = isSelected ? 2 : 1;
         ctx.beginPath();
-        ctx.roundRect(x, y, SHOP_ITEM_W, SHOP_ITEM_H, 6);
+        ctx.roundRect(x, y, shopItemW, shopItemH, 6);
         ctx.fill();
         ctx.stroke();
 
@@ -334,24 +430,26 @@ function renderTowerShop(ctx, game, input) {
 
         ctx.save();
         ctx.beginPath();
-        ctx.roundRect(x, y, SHOP_ITEM_W, SHOP_ITEM_H, 6);
+        ctx.roundRect(x, y, shopItemW, shopItemH, 6);
         ctx.clip();
-        const iconX = x + 34;
-        const iconY = y + SHOP_ITEM_H / 2;
-        drawTower(ctx, td.id, iconX, iconY, 38, 'idle');
+        const iconX = x + Math.min(36, Math.floor(shopItemW * 0.22));
+        const iconY = y + shopItemH / 2;
+        drawTower(ctx, td.id, iconX, iconY, m.towerIconR, 'idle');
         ctx.restore();
 
         ctx.globalAlpha = showBright ? 1.0 : 0.48;
         ctx.fillStyle = COLORS.textPrimary;
-        ctx.font = `bold 12px 'Arial Rounded MT Bold', sans-serif`;
+        ctx.font = m.fontTowerName;
         ctx.textAlign = 'right';
         ctx.textBaseline = 'top';
-        ctx.fillText(td.name, x + SHOP_ITEM_W - 8, y + 8);
+        const nameY = shopItemH >= 50 ? y + 9 : y + 8;
+        ctx.fillText(td.name, x + shopItemW - 8, nameY);
 
         ctx.fillStyle = affordable ? '#4CAF50' : COLORS.textAccent;
-        ctx.font = `bold 11px sans-serif`;
+        ctx.font = m.fontTowerCost;
         ctx.textAlign = 'right';
-        ctx.fillText(`$${td.tiers[0].cost}`, x + SHOP_ITEM_W - 8, y + 26);
+        const costY = shopItemH >= 50 ? y + 28 : y + 26;
+        ctx.fillText(`$${td.tiers[0].cost}`, x + shopItemW - 8, costY);
 
         ctx.globalAlpha = 1.0;
     }
@@ -389,13 +487,14 @@ function formatSpecial(special) {
     }
 }
 
-function renderSelectedInfo(ctx, game) {
+function renderSelectedInfo(ctx, game, m) {
     if (!game.selectedTower) return;
     const tower = game.selectedTower;
     const x = SIDEBAR_X + 12;
     const w = SIDEBAR_WIDTH - 24;
-    const panelH = 160;
+    const panelH = m.panelSelectedH;
     const y = CANVAS_HEIGHT - panelH - 6;
+    const btnH = m.btnRowH;
 
     ctx.fillStyle = '#FFFFFF';
     ctx.strokeStyle = COLORS.sidebarBorder;
@@ -416,7 +515,7 @@ function renderSelectedInfo(ctx, game) {
     ctx.restore();
 
     ctx.fillStyle = COLORS.textPrimary;
-    ctx.font = `bold 14px 'Arial Rounded MT Bold', sans-serif`;
+    ctx.font = m.fontSelTitle;
     ctx.textAlign = 'left';
     ctx.textBaseline = 'top';
     ctx.fillText(tower.typeData.name, x + 50, cy);
@@ -424,7 +523,7 @@ function renderSelectedInfo(ctx, game) {
     cy += 30;
 
     const buffed = tower.getBuffedStats(game.towers);
-    ctx.font = `bold 12px sans-serif`;
+    ctx.font = m.fontSelStat;
     ctx.fillStyle = '#555';
     ctx.fillText(`DMG ${buffed.damage}`, x + pad, cy);
     ctx.fillText(`RNG ${buffed.range}`, x + pad + 68, cy);
@@ -433,7 +532,7 @@ function renderSelectedInfo(ctx, game) {
 
     const specialText = formatSpecial(buffed.special);
     if (specialText) {
-        ctx.font = `bold 11px sans-serif`;
+        ctx.font = m.fontSelSpecial;
         ctx.fillStyle = '#9C27B0';
         ctx.fillText(specialText, x + pad, cy);
     }
@@ -446,7 +545,7 @@ function renderSelectedInfo(ctx, game) {
         const rngDiff = +(next.range - curr.range).toFixed(1);
         const spdDiff = next.speed - curr.speed;
 
-        ctx.font = `11px sans-serif`;
+        ctx.font = m.fontSelNext;
         let dx = x + pad;
         ctx.fillStyle = '#AAA';
         ctx.fillText('Next:', dx, cy);
@@ -472,11 +571,11 @@ function renderSelectedInfo(ctx, game) {
         const currSpecial = formatSpecial(curr.special);
         if (nextSpecial && nextSpecial !== currSpecial) {
             ctx.fillStyle = '#9C27B0';
-            ctx.font = `10px sans-serif`;
+            ctx.font = m.fontSelHint;
             ctx.fillText(`\u2192 ${nextSpecial}`, x + pad + 32, cy);
         }
     } else {
-        ctx.font = `11px sans-serif`;
+        ctx.font = m.fontSelNext;
         ctx.fillStyle = '#999';
         ctx.fillText('Fully upgraded', x + pad, cy);
     }
@@ -486,21 +585,21 @@ function renderSelectedInfo(ctx, game) {
     if (tower.canUpgrade()) {
         const cost = tower.getUpgradeCost();
         const canAfford = game.money >= cost || game.testMode;
-        game._upgradeBtn = drawButton(ctx, x + 2, cy, btnW, 30, `Upgrade $${cost}`, '#4CAF50', canAfford);
+        game._upgradeBtn = drawButton(ctx, x + 2, cy, btnW, btnH, `Upgrade $${cost}`, '#4CAF50', canAfford);
     } else {
-        game._upgradeBtn = drawButton(ctx, x + 2, cy, btnW, 30, 'MAX', '#9E9E9E', false);
+        game._upgradeBtn = drawButton(ctx, x + 2, cy, btnW, btnH, 'MAX', '#9E9E9E', false);
     }
     const sellVal = tower.getSellValue();
-    game._sellBtn = drawButton(ctx, x + 6 + btnW, cy, btnW, 30, `Sell $${sellVal}`, '#F44336', true);
-    cy += 38;
+    game._sellBtn = drawButton(ctx, x + 6 + btnW, cy, btnW, btnH, `Sell $${sellVal}`, '#F44336', true);
+    cy += btnH + 8;
 
-    ctx.font = `10px sans-serif`;
+    ctx.font = m.fontSelHint;
     ctx.fillStyle = '#AAA';
     ctx.textAlign = 'center';
     ctx.fillText('[U] Upgrade  [S] Sell  [Esc] Deselect', SIDEBAR_X + SIDEBAR_WIDTH / 2, cy);
 }
 
-function renderPlacingInfo(ctx, game) {
+function renderPlacingInfo(ctx, game, m) {
     if (!game.placingTowerId || game.selectedTower) return;
 
     const td = TOWER_DATA.find(t => t.id === game.placingTowerId);
@@ -508,7 +607,7 @@ function renderPlacingInfo(ctx, game) {
 
     const base = td.tiers[0];
     const showNeedFunds = !game.testMode && game.money < base.cost;
-    const panelH = showNeedFunds ? 96 : 82;
+    const panelH = showNeedFunds ? m.panelPlacingHNeed : m.panelPlacingHOk;
     const y = CANVAS_HEIGHT - panelH - 6;
     const x = SIDEBAR_X + 12;
     const w = SIDEBAR_WIDTH - 24;
@@ -530,16 +629,16 @@ function renderPlacingInfo(ctx, game) {
     ctx.restore();
 
     ctx.fillStyle = COLORS.textPrimary;
-    ctx.font = `bold 14px 'Arial Rounded MT Bold', sans-serif`;
+    ctx.font = m.fontPlaceTitle;
     ctx.textAlign = 'left';
     ctx.textBaseline = 'top';
     ctx.fillText(td.name, x + 50, y + pad);
 
-    ctx.font = `italic 10px sans-serif`;
+    ctx.font = m.fontPlaceDesc;
     ctx.fillStyle = '#999';
     ctx.fillText(td.description, x + 50, y + pad + 16);
 
-    ctx.font = `bold 12px sans-serif`;
+    ctx.font = m.fontPlaceStat;
     ctx.fillStyle = '#555';
     ctx.fillText(`DMG ${base.damage}`, x + pad, y + pad + 36);
     ctx.fillText(`RNG ${base.range}`, x + pad + 68, y + pad + 36);
@@ -547,26 +646,33 @@ function renderPlacingInfo(ctx, game) {
 
     const specialText = formatSpecial(base.special);
     if (specialText) {
-        ctx.font = `bold 11px sans-serif`;
+        ctx.font = m.fontPlaceSpecial;
         ctx.fillStyle = '#9C27B0';
         ctx.fillText(specialText, x + pad, y + pad + 52);
     }
 
     if (showNeedFunds) {
-        ctx.font = `bold 10px sans-serif`;
+        ctx.font = m.fontPlaceNeed;
         ctx.fillStyle = COLORS.textAccent;
         ctx.textAlign = 'left';
         ctx.fillText(`Need $${base.cost} to place (preview)`, x + pad, y + panelH - 14);
     }
 }
 
-export function getStartWaveBtn(game) {
+export function getStartWaveBtn(game, vp) {
     if (game.phase !== 'prep') return null;
+    const m = getSidebarMetrics(vp.compactSidebar);
+    let startBtnY = m.startBtnY;
+    let startBtnH = m.startBtnH;
+    if (vp.touchHandheld && vp.landscape && !vp.compactSidebar) {
+        startBtnH = Math.max(startBtnH, 40);
+        startBtnY = Math.min(startBtnY, 128);
+    }
     return {
         x: SIDEBAR_X + 12,
-        y: 128,
+        y: startBtnY,
         w: SIDEBAR_WIDTH - 24,
-        h: 32,
+        h: startBtnH,
     };
 }
 
@@ -574,7 +680,14 @@ const SCREEN_BACK_BTN_R = 22;
 
 /** Top-left circular back control (gameplay, map select, difficulty select). */
 export function getScreenBackButton() {
-    const r = SCREEN_BACK_BTN_R;
+    let r = SCREEN_BACK_BTN_R;
+    try {
+        const vw = window.visualViewport?.width ?? window.innerWidth;
+        const vh = window.visualViewport?.height ?? window.innerHeight;
+        if (vw > vh && window.matchMedia('(pointer: coarse)').matches) {
+            r = 26;
+        }
+    } catch { /* ignore */ }
     return { cx: 10 + r, cy: 10 + r, r };
 }
 
@@ -606,13 +719,14 @@ export function renderTitleMenuBtn(ctx, game, mouseX, mouseY) {
     renderScreenBackButton(ctx, mouseX, mouseY);
 }
 
-export function renderStartWaveBtn(ctx, game) {
+export function renderStartWaveBtn(ctx, game, vp) {
     if (game.phase !== 'prep') return;
-    const btn = getStartWaveBtn(game);
-    drawButton(ctx, btn.x, btn.y, btn.w, btn.h, 'Start Wave [Space]', '#E74C3C', true);
+    const btn = getStartWaveBtn(game, vp);
+    const label = vp.touchHandheld ? 'Start Wave' : 'Start Wave [Space]';
+    drawButton(ctx, btn.x, btn.y, btn.w, btn.h, label, '#E74C3C', true);
 }
 
-export function handleGameClick(game, clickX, clickY, input) {
+export function handleGameClick(game, clickX, clickY, input, vp) {
     if (clickX < GAME_AREA_WIDTH) {
         const cell = pixelToCell(clickX, clickY);
 
@@ -640,7 +754,8 @@ export function handleGameClick(game, clickX, clickY, input) {
         return;
     }
 
-    const swBtn = getStartWaveBtn(game);
+    const m = getSidebarMetrics(vp.compactSidebar);
+    const swBtn = getStartWaveBtn(game, vp);
     if (swBtn && hitTest(clickX, clickY, swBtn)) {
         if (game.audio) game.audio.playClick();
         game.startWave();
@@ -663,12 +778,12 @@ export function handleGameClick(game, clickX, clickY, input) {
 
     for (let i = 0; i < TOWER_DATA.length; i++) {
         const td = TOWER_DATA[i];
-        const col = i % SHOP_COLS;
-        const row = Math.floor(i / SHOP_COLS);
-        const sx = SIDEBAR_X + 12 + col * (SHOP_ITEM_W + SHOP_GAP);
-        const sy = SHOP_START_Y + row * (SHOP_ITEM_H + SHOP_GAP);
+        const col = i % m.shopCols;
+        const row = Math.floor(i / m.shopCols);
+        const sx = SIDEBAR_X + 12 + col * (m.shopItemW + m.shopGap);
+        const sy = m.shopStartY + row * (m.shopItemH + m.shopGap);
 
-        if (hitTest(clickX, clickY, { x: sx, y: sy, w: SHOP_ITEM_W, h: SHOP_ITEM_H })) {
+        if (hitTest(clickX, clickY, { x: sx, y: sy, w: m.shopItemW, h: m.shopItemH })) {
             if (game.audio) game.audio.playClick();
             if (game.placingTowerId === td.id) {
                 game.placingTowerId = null;
@@ -685,15 +800,26 @@ function hitTest(px, py, rect) {
     return px >= rect.x && px <= rect.x + rect.w && py >= rect.y && py <= rect.y + rect.h;
 }
 
-const AUDIO_BTN = { x: 8, y: CANVAS_HEIGHT - 32, w: 32, h: 32 };
-
-export function getAudioBtnRect() { return AUDIO_BTN; }
+export function getAudioBtnRect() {
+    try {
+        const vw = window.visualViewport?.width ?? window.innerWidth;
+        const vh = window.visualViewport?.height ?? window.innerHeight;
+        const landscape = vw > vh;
+        const coarse = window.matchMedia('(pointer: coarse)').matches;
+        const large = coarse && landscape;
+        const s = large ? 36 : 32;
+        return { x: 8, y: CANVAS_HEIGHT - s, w: s, h: s };
+    } catch {
+        return { x: 8, y: CANVAS_HEIGHT - 32, w: 32, h: 32 };
+    }
+}
 
 export function renderAudioToggle(ctx, audio, mouseX, mouseY) {
-    const b = AUDIO_BTN;
+    const b = getAudioBtnRect();
     const hover = mouseX >= b.x && mouseX <= b.x + b.w &&
                   mouseY >= b.y && mouseY <= b.y + b.h;
-    drawSpeakerIcon(ctx, b.x + b.w / 2, b.y + b.h / 2, 24, audio.muted, hover);
+    const iconR = b.w >= 36 ? 26 : 24;
+    drawSpeakerIcon(ctx, b.x + b.w / 2, b.y + b.h / 2, iconR, audio.muted, hover);
 }
 
 export function renderOverlay(ctx, game) {

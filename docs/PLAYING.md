@@ -24,6 +24,7 @@ Conveyor sushi heads toward the trash. You place **animals** on buildable seats 
 - **Tap** = click. All UI is tap-driven; **no keyboard required**.
 - **Drag** on the canvas updates the “cursor” position for hovers (shop highlights, tower range preview, etc.).
 - **Mute** is the speaker icon **bottom-left**. **Back** is the **round arrow top-left** on map select, difficulty select, and in-game (hidden on game-over / victory overlays).
+- **Portrait vs landscape:** In **portrait** on a typical phone, the gameplay sidebar uses **larger text and buttons** so the shop stays legible. In **landscape**, the same sidebar uses **tighter spacing** so everything still fits the fixed game height; **Start Wave**, **mute**, and **back** stay easy to tap. **Tablets** mostly match the desktop sidebar layout.
 - **iOS tip:** Add to Home Screen for a fuller-screen experience. **Unmute** once after a tap so Web Audio can start (browser rule).
 
 ## Difficulty (per run)
@@ -43,8 +44,9 @@ Starts **muted**. Toggle with the speaker or **M** (keyboard). BGM can run acros
 ## Mobile implementation notes (dev)
 
 - Input is **Pointer Events** when available (mouse + touch + pen); older browsers fall back to mouse + touch listeners on the canvas.
-- Canvas uses **`touch-action: none`** so drags don’t scroll the page.
+- Canvas uses **`touch-action: none`** so drags don’t scroll the page. **`overscroll-behavior: none`** and **`touch-action: manipulation`** on `body` reduce accidental scroll/zoom behavior (see `src/index.html`).
 - Layout uses **`visualViewport`** when present so scaling tracks mobile browser chrome.
-- Internal resolution stays **960×640**; CSS scales the canvas to fit the screen.
+- Internal resolution stays **960×640**; CSS scales the canvas to fit the screen. **`getViewportState()`** in `src/js/main.js` exposes `landscape`, `touchHandheld`, and `compactSidebar`; gameplay passes that object into `src/js/ui.js` for sidebar metrics, Start Wave geometry, and hit-testing. **`fitCanvas`** uses smaller outer padding in landscape on coarse pointers.
+- **Audio** and **back** controls read the viewport in `ui.js` for slightly larger hit targets in **landscape + coarse** mode.
 
 See the root **[README](../README.md)** for run, test, and deploy instructions.
