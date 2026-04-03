@@ -1,0 +1,33 @@
+{
+  "name": "nigiri-td",
+  "version": "1.0.0",
+  "description": "Canvas tower defense — defend the sushi counter from escaping nigiri (vanilla JS)",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "node tests/enemy-path.test.mjs && node tests/belt-orientation.test.mjs && node tests/sidebar-layout.test.mjs",
+    "serve": "npx --yes serve@14 src -l 3002"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DavisWang/nigiri-td.git"
+  },
+  "bugs": {
+    "url": "https://github.com/DavisWang/nigiri-td/issues"
+  },
+  "homepage": "https://github.com/DavisWang/nigiri-td#readme",
+  "keywords": [
+    "game",
+    "tower-defense",
+    "canvas",
+    "javascript"
+  ],
+  "author": "Pwner Studios",
+  "license": "ISC",
+  "type": "module",
+  "dependencies": {
+    "playwright": "^1.59.0"
+  }
+}
