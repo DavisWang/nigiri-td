@@ -76,3 +76,7 @@ git push -u origin main
 ```
 
 If the remote already has commits (for example a README created on GitHub), use `git pull origin main --rebase` before the first push, or follow GitHub’s merge instructions.
+
+### GitHub Pages
+
+The game’s `index.html` is in **`src/`**, not the repository root. “Deploy from branch” with root `/` will not serve the game until you either point your host at `src` as the public folder (e.g. Netlify **Publish directory** = `src`) or add a small workflow that publishes `src` to Pages. The [empty upstream repo](https://github.com/DavisWang/nigiri-td) has no conflicting files yet, so a plain first push is fine.
