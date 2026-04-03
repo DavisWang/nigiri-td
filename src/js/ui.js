@@ -3,12 +3,12 @@ import {
     CELL_SIZE, GRID_COLS, GRID_ROWS, GRID_OFFSET_X, GRID_OFFSET_Y,
     COLORS, TOWER_DATA,
     cellToPixel, pixelToCell,
-    getTotalCost,
+    getTotalCost, getDifficultyProfile,
 } from './data.js';
 import {
-    drawTower, drawNigiri, drawHeart, drawCoin, drawButton,
+    drawTower, drawNigiri, drawHeart, drawCoin, drawButton, drawRoundBackButton,
     drawGarbageBin, drawKitchenDoor, drawSeatIndicator, drawBeltTile,
-    drawTierStars, drawSpeakerIcon, drawDifficultyStars,
+    drawTierStars, drawSpeakerIcon,
 } from './sprites.js';
 
 const SHOP_COLS = 2;
@@ -189,16 +189,50 @@ function renderMapInfo(ctx, game) {
     ctx.textAlign = 'left';
     ctx.textBaseline = 'middle';
     ctx.fillText(game.mapCtx.def.name, x, 10);
-    drawDifficultyStars(ctx, x, 22, game.mapCtx.def.difficulty, 5, 8);
+    const diff = getDifficultyProfile(game.difficultyId);
+    ctx.font = `bold 11px 'Arial Rounded MT Bold', sans-serif`;
+    ctx.fillStyle = diff.accent;
+    ctx.textAlign = 'right';
+    ctx.fillText(diff.label, SIDEBAR_X + SIDEBAR_WIDTH - 12, 10);
+    ctx.textAlign = 'left';
+    ctx.fillStyle = COLORS.textPrimary;
 }
 
 function renderHUD(ctx, game) {
     const startX = SIDEBAR_X + 12;
-    const y = 36;
+    const rightX = SIDEBAR_X + SIDEBAR_WIDTH - 12;
+    const rowY = 40;
+    const minGapMoneyHearts = 10;
+
+    drawCoin(ctx, startX + 10, rowY, 22);
+    ctx.fillStyle = COLORS.money;
+    ctx.font = `bold 18px 'Arial Rounded MT Bold', sans-serif`;
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'middle';
+    const moneyStr = `${game.money}`;
+    ctx.fillText(moneyStr, startX + 28, rowY);
+    const moneyEndX = startX + 28 + ctx.measureText(moneyStr).width;
 
     const heartCount = Math.min(game.maxLife, 10);
     const heartsPerIcon = game.maxLife / heartCount;
+    const heartSize = 20;
+    let heartSpacing = 16;
+
+    ctx.font = `bold 16px 'Arial Rounded MT Bold', sans-serif`;
+    const lifeStr = `${game.life}`;
+    const lifeW = ctx.measureText(lifeStr).width;
+    const padBeforeLife = 8;
+    const lastIdx = Math.max(0, heartCount - 1);
+    const lastHeartCenter = () => rightX - lifeW - padBeforeLife - 4;
+
+    let firstHeartCenter = lastHeartCenter() - lastIdx * heartSpacing;
+    while (lastIdx > 0 && firstHeartCenter - heartSize * 0.45 < moneyEndX + minGapMoneyHearts && heartSpacing > 12) {
+        heartSpacing -= 1;
+        firstHeartCenter = lastHeartCenter() - lastIdx * heartSpacing;
+    }
+
     for (let i = 0; i < heartCount; i++) {
+        const cx = firstHeartCenter + i * heartSpacing;
         const lifeForHeart = (i + 1) * heartsPerIcon;
         const active = game.life >= lifeForHeart - heartsPerIcon;
         ctx.globalAlpha = active ? 1.0 : 0.2;
@@ -206,27 +240,21 @@ function renderHUD(ctx, game) {
             const pulse = Math.sin(Date.now() * 0.008) * 0.2 + 0.8;
             ctx.globalAlpha = pulse;
         }
-        drawHeart(ctx, startX + i * 26, y, 24);
+        drawHeart(ctx, cx, rowY, heartSize);
     }
     ctx.globalAlpha = 1.0;
 
     ctx.fillStyle = COLORS.life;
     ctx.font = `bold 16px 'Arial Rounded MT Bold', sans-serif`;
-    ctx.textAlign = 'left';
+    ctx.textAlign = 'right';
     ctx.textBaseline = 'middle';
-    ctx.fillText(`${game.life}`, startX + heartCount * 26 + 5, y);
-
-    const moneyY = y + 24;
-    drawCoin(ctx, startX + 10, moneyY, 22);
-    ctx.fillStyle = COLORS.money;
-    ctx.font = `bold 18px 'Arial Rounded MT Bold', sans-serif`;
+    ctx.fillText(lifeStr, rightX, rowY);
     ctx.textAlign = 'left';
-    ctx.fillText(`${game.money}`, startX + 28, moneyY);
 }
 
 function renderRoundInfo(ctx, game) {
     const x = SIDEBAR_X + SIDEBAR_WIDTH / 2;
-    const y = 82;
+    const y = 72;
 
     ctx.fillStyle = COLORS.textPrimary;
     ctx.font = `bold 16px 'Arial Rounded MT Bold', sans-serif`;
@@ -242,7 +270,7 @@ function renderWavePreview(ctx, game) {
     if (preview.length === 0) return;
 
     const startX = SIDEBAR_X + 12;
-    const y = 102;
+    const y = 92;
 
     ctx.fillStyle = COLORS.textPrimary;
     ctx.font = `12px 'Arial Rounded MT Bold', sans-serif`;
@@ -536,10 +564,46 @@ export function getStartWaveBtn(game) {
     if (game.phase !== 'prep') return null;
     return {
         x: SIDEBAR_X + 12,
-        y: 138,
+        y: 128,
         w: SIDEBAR_WIDTH - 24,
         h: 32,
     };
+}
+
+const SCREEN_BACK_BTN_R = 22;
+
+/** Top-left circular back control (gameplay, map select, difficulty select). */
+export function getScreenBackButton() {
+    const r = SCREEN_BACK_BTN_R;
+    return { cx: 10 + r, cy: 10 + r, r };
+}
+
+export function hitScreenBackButton(px, py) {
+    const b = getScreenBackButton();
+    const dx = px - b.cx;
+    const dy = py - b.cy;
+    return dx * dx + dy * dy <= b.r * b.r;
+}
+
+export function renderScreenBackButton(ctx, mouseX, mouseY) {
+    const b = getScreenBackButton();
+    drawRoundBackButton(ctx, b.cx, b.cy, b.r, hitScreenBackButton(mouseX, mouseY));
+}
+
+/** Gameplay only: hidden during end-game overlays. */
+export function getTitleMenuBtn(game) {
+    if (game.gameOver || game.victory) return null;
+    return getScreenBackButton();
+}
+
+export function hitTitleMenuBtn(px, py, game) {
+    if (!getTitleMenuBtn(game)) return false;
+    return hitScreenBackButton(px, py);
+}
+
+export function renderTitleMenuBtn(ctx, game, mouseX, mouseY) {
+    if (!getTitleMenuBtn(game)) return;
+    renderScreenBackButton(ctx, mouseX, mouseY);
 }
 
 export function renderStartWaveBtn(ctx, game) {

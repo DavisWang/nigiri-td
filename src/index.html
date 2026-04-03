@@ -2,23 +2,39 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>Nigiri TD — By Pwner Studios</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
+        html {
+            height: 100%;
+            height: -webkit-fill-available;
+        }
         body {
             background: #2C2C2C;
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
+            min-height: 100%;
+            min-height: -webkit-fill-available;
             overflow: hidden;
+            padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+            -webkit-touch-callout: none;
         }
-        canvas {
+        #gameCanvas {
+            display: block;
             border-radius: 8px;
             box-shadow: 0 4px 24px rgba(0,0,0,0.4);
             cursor: default;
+            touch-action: none;
+            -webkit-user-select: none;
+            user-select: none;
             image-rendering: -webkit-optimize-contrast;
+            max-width: 100%;
+            max-height: 100%;
         }
     </style>
 </head>

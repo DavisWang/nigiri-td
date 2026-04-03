@@ -5,13 +5,14 @@ import {
 } from './data.js';
 
 export class Enemy {
-    constructor(typeId, mapPath) {
+    constructor(typeId, mapPath, hpMult = 1) {
         const data = ENEMY_DATA.find(e => e.id === typeId);
         this.data = data;
         this.id = typeId;
         this.mapPath = mapPath;
-        this.maxHp = data.hp;
-        this.hp = data.hp;
+        const h = data.hp * hpMult;
+        this.maxHp = h;
+        this.hp = h;
         this.speed = data.speed;
         this.money = data.money;
         this.lifePenalty = data.lifePenalty;
@@ -255,10 +256,11 @@ export class Tower {
 }
 
 export class EnemySpawner {
-    constructor(queue, interval, pathProvider) {
+    constructor(queue, interval, pathProvider, hpMult = 1) {
         this.queue = [...queue];
         this.interval = interval;
         this.pathProvider = pathProvider;
+        this.hpMult = hpMult;
         this.timer = 0;
         this.done = false;
     }
@@ -270,7 +272,7 @@ export class EnemySpawner {
             this.timer = this.interval;
             const id = this.queue.shift();
             if (this.queue.length === 0) this.done = true;
-            return new Enemy(id, this.pathProvider());
+            return new Enemy(id, this.pathProvider(), this.hpMult);
         }
         return null;
     }

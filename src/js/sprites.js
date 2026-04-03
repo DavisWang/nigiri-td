@@ -91,6 +91,29 @@ export function drawCoin(ctx, x, y, size) {
     ctx.fillText('$', x, y + 1);
 }
 
+/** Circular control with a left-pointing chevron (e.g. back to title). */
+export function drawRoundBackButton(ctx, cx, cy, r, hover) {
+    const fill = hover ? '#95A5A6' : '#7F8C8D';
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, 0, Math.PI * 2);
+    ctx.fillStyle = fill;
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(0,0,0,0.18)';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+
+    ctx.strokeStyle = '#FFFFFF';
+    ctx.lineWidth = 2.5;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    const s = r * 0.38;
+    ctx.beginPath();
+    ctx.moveTo(cx + s * 0.2, cy - s);
+    ctx.lineTo(cx - s * 0.55, cy);
+    ctx.lineTo(cx + s * 0.2, cy + s);
+    ctx.stroke();
+}
+
 export function drawButton(ctx, x, y, w, h, text, color, enabled = true) {
     const radius = 8;
     ctx.globalAlpha = enabled ? 1.0 : 0.5;
@@ -359,15 +382,6 @@ function drawStar(ctx, cx, cy, outerR, innerR, points) {
     }
     ctx.closePath();
     ctx.fill();
-}
-
-export function drawDifficultyStars(ctx, x, y, difficulty, maxDifficulty = 5, size = 10) {
-    const gap = size * 1.4;
-    for (let i = 0; i < maxDifficulty; i++) {
-        const sx = x + i * gap;
-        ctx.fillStyle = i < difficulty ? '#F1C40F' : '#CCCCCC';
-        drawStar(ctx, sx, y, size * 0.5, size * 0.25, 5);
-    }
 }
 
 export function drawSpeakerIcon(ctx, cx, cy, size, muted, hover) {

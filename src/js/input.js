@@ -9,22 +9,95 @@ export class InputManager {
         this.keysPressed = new Set();
         this.keysJustPressed = new Set();
 
-        canvas.addEventListener('mousemove', (e) => {
+        const rectScale = () => {
             const rect = canvas.getBoundingClientRect();
-            const scaleX = canvas.width / rect.width;
-            const scaleY = canvas.height / rect.height;
-            this.mouseX = (e.clientX - rect.left) * scaleX;
-            this.mouseY = (e.clientY - rect.top) * scaleY;
-        });
+            const sx = canvas.width / rect.width;
+            const sy = canvas.height / rect.height;
+            return { rect, sx, sy };
+        };
 
-        canvas.addEventListener('click', (e) => {
-            const rect = canvas.getBoundingClientRect();
-            const scaleX = canvas.width / rect.width;
-            const scaleY = canvas.height / rect.height;
+        const setFromClient = (clientX, clientY) => {
+            const { rect, sx, sy } = rectScale();
+            this.mouseX = (clientX - rect.left) * sx;
+            this.mouseY = (clientY - rect.top) * sy;
+        };
+
+        const registerClick = () => {
             this.clicked = true;
-            this.clickX = (e.clientX - rect.left) * scaleX;
-            this.clickY = (e.clientY - rect.top) * scaleY;
-        });
+            this.clickX = this.mouseX;
+            this.clickY = this.mouseY;
+        };
+
+        if (window.PointerEvent) {
+            canvas.addEventListener('pointermove', (e) => {
+                setFromClient(e.clientX, e.clientY);
+            });
+
+            canvas.addEventListener('pointerdown', (e) => {
+                if (!e.isPrimary) return;
+                if (e.pointerType === 'mouse' && e.button !== 0) return;
+                setFromClient(e.clientX, e.clientY);
+                try {
+                    canvas.setPointerCapture(e.pointerId);
+                } catch {
+                    /* ignore */
+                }
+            });
+
+            canvas.addEventListener('pointerup', (e) => {
+                if (!e.isPrimary) return;
+                if (e.pointerType === 'mouse' && e.button !== 0) return;
+                setFromClient(e.clientX, e.clientY);
+                registerClick();
+                try {
+                    canvas.releasePointerCapture(e.pointerId);
+                } catch {
+                    /* ignore */
+                }
+            });
+
+            canvas.addEventListener('pointercancel', (e) => {
+                try {
+                    canvas.releasePointerCapture(e.pointerId);
+                } catch {
+                    /* ignore */
+                }
+            });
+        } else {
+            canvas.addEventListener('mousemove', (e) => {
+                setFromClient(e.clientX, e.clientY);
+            });
+
+            canvas.addEventListener('click', (e) => {
+                setFromClient(e.clientX, e.clientY);
+                registerClick();
+            });
+
+            const touchOpts = { passive: false };
+            canvas.addEventListener('touchstart', (e) => {
+                if (e.targetTouches.length === 1) {
+                    const t = e.targetTouches[0];
+                    setFromClient(t.clientX, t.clientY);
+                }
+            }, touchOpts);
+
+            canvas.addEventListener('touchmove', (e) => {
+                if (e.targetTouches.length === 1) {
+                    e.preventDefault();
+                    const t = e.targetTouches[0];
+                    setFromClient(t.clientX, t.clientY);
+                }
+            }, touchOpts);
+
+            canvas.addEventListener('touchend', (e) => {
+                if (e.changedTouches.length >= 1) {
+                    e.preventDefault();
+                    const t = e.changedTouches[0];
+                    setFromClient(t.clientX, t.clientY);
+                    registerClick();
+                }
+            }, touchOpts);
+        }
 
         window.addEventListener('keydown', (e) => {
             if (!this.keysPressed.has(e.key)) {
@@ -36,6 +109,8 @@ export class InputManager {
         window.addEventListener('keyup', (e) => {
             this.keysPressed.delete(e.key);
         });
+
+        canvas.addEventListener('contextmenu', (e) => e.preventDefault());
     }
 
     consumeClick() {

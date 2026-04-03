@@ -2,7 +2,7 @@ import {
     STARTING_MONEY, STARTING_LIFE, TEST_ROUND_DATA, TOWER_DATA, ENEMY_DATA,
     GRID_COLS, GRID_ROWS,
     getTotalCost, getSellValue, getUpgradeCost, getRoundBonus, buildSpawnQueue,
-    MapContext, getMapById,
+    MapContext, getMapById, getDifficultyProfile,
 } from './data.js';
 import { Tower, EnemySpawner } from './entities.js';
 import { EffectManager } from './effects.js';
@@ -13,11 +13,16 @@ export class GameState {
         this.reset();
     }
 
-    reset(mapId = 'kaiten', testMode = false) {
+    reset(mapId = 'kaiten', testMode = false, difficultyId = 'easy') {
         this.testMode = testMode;
         this.mapId = mapId;
         this.mapCtx = new MapContext(getMapById(mapId));
-        this.money = testMode ? 99999 : STARTING_MONEY;
+        const diff = getDifficultyProfile(difficultyId);
+        this.difficultyId = difficultyId;
+        this.hpMult = diff.hpMult;
+        this.spawnIntervalMult = diff.spawnIntervalMult;
+        const moneyBonus = this.mapCtx.def.startingMoneyBonus || 0;
+        this.money = testMode ? 99999 : STARTING_MONEY + moneyBonus;
         this.life = STARTING_LIFE;
         this.maxLife = STARTING_LIFE;
         this.round = 0;
@@ -94,7 +99,8 @@ export class GameState {
         const roundData = this._roundData[this.round];
         const queue = buildSpawnQueue(roundData);
         const pathProvider = () => this.mapCtx.getEnemyPath();
-        this.spawner = new EnemySpawner(queue, roundData.spawnInterval, pathProvider);
+        const interval = Math.max(120, Math.round(roundData.spawnInterval * this.spawnIntervalMult));
+        this.spawner = new EnemySpawner(queue, interval, pathProvider, this.hpMult);
         this.phase = 'wave';
         this.roundEaten = 0;
         this.roundEarned = 0;

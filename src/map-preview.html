@@ -12,8 +12,7 @@
             color: #FFF8E7;
             padding: 24px;
         }
-        h1 { text-align: center; margin-bottom: 8px; font-size: 32px; color: #E74C3C; }
-        .subtitle { text-align: center; margin-bottom: 24px; color: #999; font-size: 14px; }
+        h1 { text-align: center; margin-bottom: 24px; font-size: 32px; color: #E74C3C; }
         .maps { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; max-width: 1300px; margin: 0 auto; }
         .map-card {
             background: #3A3A3A;
@@ -21,9 +20,8 @@
             padding: 16px;
             box-shadow: 0 4px 16px rgba(0,0,0,0.3);
         }
-        .map-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 2px; }
+        .map-header { margin-bottom: 2px; }
         .map-name { font-size: 18px; font-weight: bold; }
-        .difficulty { color: #F1C40F; font-size: 16px; letter-spacing: 2px; }
         .map-concept { color: #AED6F1; font-size: 13px; font-weight: bold; margin-bottom: 2px; }
         .map-desc { color: #AAA; font-size: 11px; line-height: 1.5; margin-bottom: 6px; }
         .stats { display: flex; gap: 14px; margin: 4px 0 8px; font-size: 11px; color: #AAA; flex-wrap: wrap; }
@@ -35,17 +33,15 @@
         }
         .legend-item { display: flex; align-items: center; gap: 4px; }
         .legend-swatch { width: 12px; height: 12px; border-radius: 3px; border: 1px solid #555; }
-        .difficulty-section {
+        .stats-section {
             max-width: 1300px; margin: 28px auto 0; background: #3A3A3A;
             border-radius: 12px; padding: 20px; font-size: 13px; color: #CCC; line-height: 1.7;
         }
-        .difficulty-section h2 { color: #F1C40F; margin-bottom: 8px; font-size: 16px; }
-        .formula { font-family: monospace; background: #2C2C2C; padding: 8px 12px; border-radius: 6px; margin: 8px 0; color: #AED6F1; font-size: 12px; }
+        .stats-section h2 { color: #F1C40F; margin-bottom: 8px; font-size: 16px; }
     </style>
 </head>
 <body>
     <h1>Nigiri TD — Map Designs</h1>
-    <p class="subtitle">Design preview — Fork, Spiral, and Cross concepts (plus Kaiten in-game). The dynamic &quot;Belt Switch&quot; map was removed from the shipped game.</p>
 
     <div class="legend">
         <div class="legend-item"><div class="legend-swatch" style="background:#B0A89A"></div> Belt</div>
@@ -58,7 +54,7 @@
     </div>
 
     <div class="maps" id="maps"></div>
-    <div class="difficulty-section" id="difficulty-section"></div>
+    <div class="stats-section" id="stats-section"></div>
 
 <script>
 const COLS = 8, ROWS = 10, CELL = 44, PAD = 10;
@@ -69,7 +65,6 @@ const MAPS = [
         name: 'The Fork',
         concept: 'CONCEPT 1: Branching Paths',
         desc: 'Belt splits into two routes at a fork. Enemies randomly take Branch A (right) or Branch B (left). Both merge before the exit. Forces you to defend BOTH sides — you can\'t stack all towers on one chokepoint.',
-        difficulty: 2,
         type: 'branching',
         shared_start: [
             {x:0,y:0},{x:1,y:0},{x:2,y:0},{x:3,y:0},
@@ -98,7 +93,6 @@ const MAPS = [
         name: 'The Spiral',
         concept: 'CONCEPT 3: Spiral / Inward Path',
         desc: 'Compact 1-turn spiral. Short 20-cell path — enemies zip through in ~21s. Rows 6–9 and cols 6–7 are dead space. Only ~22 seats surround the tight spiral. Every tower placement is critical.',
-        difficulty: 3,
         type: 'single',
         path: [
             {x:0,y:0},{x:1,y:0},{x:2,y:0},{x:3,y:0},{x:4,y:0},{x:5,y:0},
@@ -114,7 +108,6 @@ const MAPS = [
         name: 'The Crossroads',
         concept: 'CONCEPT 4: Cross / Intersection',
         desc: 'Belt forms a + shape, crossing itself at the center. Enemies pass through the intersection TWICE — once going right, once going left. The cross cell is the ultimate chokepoint: any tower there covers 4 path segments.',
-        difficulty: 4,
         type: 'cross',
         path: [
             {x:0,y:0},{x:1,y:0},{x:2,y:0},{x:3,y:0},{x:4,y:0},
@@ -368,7 +361,6 @@ function renderMap(container, m) {
     const card = document.createElement('div');
     card.className = 'map-card';
 
-    const stars = '★'.repeat(m.difficulty) + '☆'.repeat(5 - m.difficulty);
     const allBelt = getAllBeltCells(m);
     const seats = countSeats(allBelt);
     const uniqueBelt = allBelt.length;
@@ -389,7 +381,6 @@ function renderMap(container, m) {
     card.innerHTML = `
         <div class="map-header">
             <span class="map-name">${m.name}</span>
-            <span class="difficulty">${stars}</span>
         </div>
         <div class="map-concept">${m.concept}</div>
         <div class="map-desc">${m.desc}</div>
@@ -425,7 +416,7 @@ function renderMap(container, m) {
 const container = document.getElementById('maps');
 MAPS.forEach(m => renderMap(container, m));
 
-const diffSection = document.getElementById('difficulty-section');
+const statsSection = document.getElementById('stats-section');
 const tableRows = MAPS.map(m => {
     const allBelt = getAllBeltCells(m);
     const seats = countSeats(allBelt);
@@ -437,16 +428,11 @@ const tableRows = MAPS.map(m => {
         <td style="padding:4px 10px;text-align:center">${ep.length}</td>
         <td style="padding:4px 10px;text-align:center">${allBelt.length}</td>
         <td style="padding:4px 10px;text-align:center">${seats}</td>
-        <td style="padding:4px 10px;color:#F1C40F">${'★'.repeat(m.difficulty)}${'☆'.repeat(5-m.difficulty)}</td>
     </tr>`;
 }).join('');
 
-diffSection.innerHTML = `
-    <h2>Difficulty Metric: "How easy is it for enemies to reach the exit?"</h2>
-    <div class="formula">
-        defenseScore = pathLength × seatCount × (1 + foldFactor × 2) × avgCoveragePerSeat<br>
-        + branching penalty (enemies split across routes, halving tower efficiency)
-    </div>
+statsSection.innerHTML = `
+    <h2>Map stats</h2>
     <table style="border-collapse:collapse; margin-top:12px; width:100%">
         <tr style="border-bottom:1px solid #555; color:#999">
             <th style="padding:6px 10px;text-align:left">Concept</th>
@@ -455,7 +441,6 @@ diffSection.innerHTML = `
             <th style="padding:6px 10px">Path</th>
             <th style="padding:6px 10px">Belt</th>
             <th style="padding:6px 10px">Seats</th>
-            <th style="padding:6px 10px">Difficulty</th>
         </tr>
         ${tableRows}
     </table>

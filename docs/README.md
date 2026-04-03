@@ -1,8 +1,14 @@
 # Nigiri TD — documentation
 
-Internal design and planning artifacts for **Nigiri TD** live under [`project/`](project/).
+## Playing the current game
 
-## Start here
+| Document | Contents |
+| --- | --- |
+| [PLAYING.md](PLAYING.md) | Screens, **desktop + touch** controls, difficulty modes, audio, mobile notes |
+
+## Design & planning (`project/`)
+
+Internal design and planning artifacts for **Nigiri TD** live under [`project/`](project/).
 
 | Document | Contents |
 | --- | --- |

@@ -63,9 +63,9 @@ export const ENEMY_DATA = [
     { id: 'tuna', name: 'Tuna', hp: 94, speed: 1.0, money: 13, lifePenalty: 2, tier: 'Standard', color: '#EF5350' },
     { id: 'mackerel', name: 'Mackerel', hp: 121, speed: 1.2, money: 16, lifePenalty: 3, tier: 'Premium', color: '#90A4AE' },
     { id: 'scallop', name: 'Hotate', hp: 154, speed: 1.0, money: 19, lifePenalty: 3, tier: 'Premium', color: '#FFF9C4' },
-    { id: 'ikura', name: 'Ikura', hp: 198, speed: 1.1, money: 24, lifePenalty: 5, tier: 'Deluxe', color: '#FF7043' },
-    { id: 'uni', name: 'Uni', hp: 264, speed: 0.9, money: 30, lifePenalty: 5, tier: 'Deluxe', color: '#FFB300' },
-    { id: 'wagyu', name: 'Wagyu', hp: 385, speed: 0.8, money: 42, lifePenalty: 6, tier: 'Boss', color: '#EF5350' },
+    { id: 'ikura', name: 'Ikura', hp: 228, speed: 1.3, money: 24, lifePenalty: 5, tier: 'Deluxe', color: '#FF7043' },
+    { id: 'uni', name: 'Uni', hp: 304, speed: 1.1, money: 30, lifePenalty: 5, tier: 'Deluxe', color: '#FFB300' },
+    { id: 'wagyu', name: 'Wagyu', hp: 443, speed: 1.0, money: 42, lifePenalty: 6, tier: 'Boss', color: '#EF5350' },
 ];
 
 function e(id, count) { return { id, count }; }
@@ -98,13 +98,13 @@ const KAITEN_ROUNDS = [
 
 export const MAP_DEFINITIONS = [
     {
-        id: 'kaiten', name: 'Kaiten Corner', subtitle: 'The Classic Snake', difficulty: 1,
+        id: 'kaiten', name: 'Kaiten Corner',
         type: 'single',
         path: KAITEN_PATH,
         rounds: KAITEN_ROUNDS,
     },
     {
-        id: 'fork', name: 'The Fork', subtitle: 'Branching Paths', difficulty: 2,
+        id: 'fork', name: 'The Fork',
         type: 'branching',
         shared_start: [{x:0,y:0},{x:1,y:0},{x:2,y:0},{x:3,y:0}],
         branchA: [{x:4,y:0},{x:5,y:0},{x:6,y:0},{x:7,y:0},{x:7,y:1},{x:7,y:2},{x:7,y:3},{x:7,y:4},{x:6,y:4},{x:5,y:4},{x:4,y:4}],
@@ -124,7 +124,7 @@ export const MAP_DEFINITIONS = [
         ],
     },
     {
-        id: 'spiral', name: 'The Spiral', subtitle: 'Compact Whirlpool', difficulty: 3,
+        id: 'spiral', name: 'The Spiral',
         type: 'single',
         path: [
             {x:0,y:0},{x:1,y:0},{x:2,y:0},{x:3,y:0},{x:4,y:0},{x:5,y:0},
@@ -148,7 +148,8 @@ export const MAP_DEFINITIONS = [
         ],
     },
     {
-        id: 'cross', name: 'The Crossroads', subtitle: 'Intersection', difficulty: 4,
+        id: 'cross', name: 'The Crossroads',
+        startingMoneyBonus: 165,
         type: 'cross',
         path: [
             {x:0,y:0},{x:1,y:0},{x:2,y:0},{x:3,y:0},{x:4,y:0},
@@ -164,22 +165,35 @@ export const MAP_DEFINITIONS = [
         ],
         crossCell: {x:4,y:4},
         rounds: [
-            { round: 1, waves: [e('tuna', 4), e('mackerel', 3), e('shrimp', 3)], spawnInterval: 1400 },
-            { round: 2, waves: [e('mackerel', 4), e('scallop', 3), e('squid', 3)], spawnInterval: 1200 },
-            { round: 3, waves: [e('scallop', 3), e('ikura', 3), e('mackerel', 5)], spawnInterval: 1100 },
-            { round: 4, waves: [e('ikura', 4), e('uni', 3), e('scallop', 4)], spawnInterval: 1000 },
-            { round: 5, waves: [e('uni', 3), e('wagyu', 2), e('ikura', 5)], spawnInterval: 920 },
-            { round: 6, waves: [e('wagyu', 3), e('uni', 4), e('ikura', 4)], spawnInterval: 800 },
-            { round: 7, waves: [e('scallop', 4), e('ikura', 3), e('tuna', 6)], spawnInterval: 980 },
-            { round: 8, waves: [e('ikura', 4), e('uni', 3), e('mackerel', 5)], spawnInterval: 900 },
-            { round: 9, waves: [e('uni', 4), e('wagyu', 2), e('scallop', 4), e('ikura', 3)], spawnInterval: 835 },
-            { round: 10, waves: [e('wagyu', 3), e('uni', 4), e('ikura', 5)], spawnInterval: 745 },
+            { round: 1, waves: [e('salmon', 4), e('shrimp', 4), e('squid', 2)], spawnInterval: 1580 },
+            { round: 2, waves: [e('tuna', 3), e('mackerel', 3), e('squid', 3)], spawnInterval: 1360 },
+            { round: 3, waves: [e('scallop', 3), e('ikura', 2), e('mackerel', 4)], spawnInterval: 1250 },
+            { round: 4, waves: [e('ikura', 3), e('uni', 2), e('scallop', 4)], spawnInterval: 1140 },
+            { round: 5, waves: [e('uni', 2), e('wagyu', 2), e('ikura', 4)], spawnInterval: 1040 },
+            { round: 6, waves: [e('wagyu', 2), e('uni', 3), e('ikura', 4)], spawnInterval: 920 },
+            { round: 7, waves: [e('scallop', 4), e('ikura', 2), e('tuna', 5)], spawnInterval: 1100 },
+            { round: 8, waves: [e('ikura', 3), e('uni', 3), e('mackerel', 4)], spawnInterval: 1020 },
+            { round: 9, waves: [e('uni', 3), e('wagyu', 2), e('scallop', 3), e('ikura', 3)], spawnInterval: 950 },
+            { round: 10, waves: [e('wagyu', 2), e('uni', 3), e('ikura', 5)], spawnInterval: 860 },
         ],
     },
 ];
 
 export function getMapById(id) {
     return MAP_DEFINITIONS.find(m => m.id === id) || MAP_DEFINITIONS[0];
+}
+
+/** Menu order for difficulty select; maps to spawn/HP multipliers. */
+export const DIFFICULTY_ORDER = ['easy', 'intermediate', 'hard'];
+
+export const DIFFICULTY_PROFILES = {
+    easy: { label: 'Easy', hint: 'Baseline HP & spawn timing', hpMult: 1, spawnIntervalMult: 1, accent: '#52BE80' },
+    intermediate: { label: 'Intermediate', hint: '+25% enemy HP', hpMult: 1.25, spawnIntervalMult: 1, accent: '#F39C12' },
+    hard: { label: 'Hard', hint: '+25% HP · 10% faster spawns', hpMult: 1.25, spawnIntervalMult: 0.9, accent: '#E74C3C' },
+};
+
+export function getDifficultyProfile(id) {
+    return DIFFICULTY_PROFILES[id] || DIFFICULTY_PROFILES.easy;
 }
 
 export class MapContext {
