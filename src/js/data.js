@@ -14,6 +14,9 @@ export const STARTING_LIFE = 15;
 export const SELL_REFUND_RATE = 0.58;
 export const BASE_BELT_SPEED = 60;
 
+/** Wave-phase speed buttons: `dt` is multiplied by the selected value (default 1×). */
+export const GAME_SPEED_LEVELS = [0.5, 1, 2];
+
 export const COLORS = {
     bg: '#FFF8E7',
     belt: '#B0A89A',
@@ -329,24 +332,34 @@ export function getRoundBonus(roundNum) { return 30 + roundNum * 7; }
 /** 0-based index of the last campaign round used as the infinite-mode wave template. */
 export const INFINITE_TEMPLATE_ROUND_INDEX = 9;
 
+/** Compound +10% enemy HP each infinite round (×1.10^(k−1)). */
+const INFINITE_HP_MULT_STEP = 1.1;
+
 export function getInfiniteHpMult(k) {
     if (k < 1) return 1;
-    return 1.06 ** (k - 1);
+    return INFINITE_HP_MULT_STEP ** (k - 1);
 }
+
+/** 1× at k=1, 2× at k=20 (display round 30), then cap. */
+const INFINITE_SPEED_K_FOR_2X = 20;
 
 export function getInfiniteSpeedMult(k) {
     if (k < 1) return 1;
-    return Math.min(1.28, 1 + 0.015 * (k - 1));
+    const span = INFINITE_SPEED_K_FOR_2X - 1;
+    return Math.min(2, 1 + (k - 1) / span);
 }
 
-/** Per infinite round, kill $ is × this (stacked each k). 0.85 = 15% less per round. */
+/** First infinite round uses 0.5× base kill $; then ×0.85 each round; floor 5%. */
+const INFINITE_MONEY_START_MULT = 0.5;
 const INFINITE_MONEY_MULT_STEP = 0.85;
-/** Minimum fraction of base kill $ (before Tanuki). */
-const INFINITE_MONEY_MULT_FLOOR = 0.1;
+const INFINITE_MONEY_MULT_FLOOR = 0.05;
 
 export function getInfiniteMoneyMult(k) {
     if (k < 1) return 1;
-    return Math.max(INFINITE_MONEY_MULT_FLOOR, INFINITE_MONEY_MULT_STEP ** (k - 1));
+    return Math.max(
+        INFINITE_MONEY_MULT_FLOOR,
+        INFINITE_MONEY_START_MULT * (INFINITE_MONEY_MULT_STEP ** (k - 1)),
+    );
 }
 
 export function getInfiniteSpawnIntervalMult(k) {

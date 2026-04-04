@@ -43,9 +43,9 @@ Optional **Continue · Infinite** keeps the same map and towers. Each **infinite
 
 | Lever | Rule (k = infinite round index, starting at 1) |
 | --- | --- |
-| Enemy HP | × `1.06^(k−1)` on top of difficulty HP |
-| Speed | × `min(1.28, 1 + 0.015×(k−1))` |
-| Kill money | × `max(0.1, 0.85^(k−1))` — 15% less per infinite round, floor 10% (Tanuki after) |
+| Enemy HP | × `1.10^(k−1)` (+10% compound per infinite round) on top of difficulty HP |
+| Speed | × `min(2, 1 + (k−1)/19)` — **2×** at **k = 20** (display round **30**), then cap |
+| Kill money | × `max(0.05, 0.5 × 0.85^(k−1))` — half at first infinite round, then 15% less per round, floor 5% (Tanuki after) |
 | Spawn interval | × `max(0.65, 0.985^(k−1))` on top of difficulty spawn mult |
 | Extra body | Every **3rd** infinite round (`k % 3 === 0`), **+1** spawn on the largest wave in the template |
 | Round-end bonus | `getRoundBonus(10) + 5×(k−1)` for the infinite round just cleared |

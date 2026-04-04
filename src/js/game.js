@@ -5,6 +5,7 @@ import {
     MapContext, getMapById, getDifficultyProfile,
     buildInfiniteRoundData, getInfiniteHpMult, getInfiniteSpeedMult, getInfiniteMoneyMult,
     getInfiniteSpawnIntervalMult, getInfiniteRoundBonus,
+    GAME_SPEED_LEVELS,
 } from './data.js';
 import { Tower, EnemySpawner } from './entities.js';
 import { EffectManager } from './effects.js';
@@ -40,12 +41,18 @@ export class GameState {
         this.infiniteMode = false;
         this.infiniteRound = 1;
         this.paused = false;
+        /** Index into {@link GAME_SPEED_LEVELS} (default 1 = 1×). */
+        this.speedIndex = 1;
         this.towerGrid = Array.from({ length: GRID_ROWS }, () => Array(GRID_COLS).fill(null));
         this.totalEaten = 0;
         this.totalEarned = 0;
         this.roundEaten = 0;
         this.roundEarned = 0;
         this._roundData = testMode ? TEST_ROUND_DATA : this.mapCtx.def.rounds;
+    }
+
+    getTimeScale() {
+        return GAME_SPEED_LEVELS[Math.max(0, Math.min(this.speedIndex, GAME_SPEED_LEVELS.length - 1))];
     }
 
     canPlaceTower(col, row) {

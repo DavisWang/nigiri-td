@@ -4,6 +4,7 @@ import {
     COLORS, TOWER_DATA,
     cellToPixel, pixelToCell,
     getTotalCost, getDifficultyProfile,
+    GAME_SPEED_LEVELS,
 } from './data.js';
 import {
     drawTower, drawNigiri, drawHeart, drawCoin, drawButton, drawRoundBackButton,
@@ -693,15 +694,46 @@ export function getStartWaveBtn(game, vp) {
     return getSidebarPhaseBtnRect(vp);
 }
 
-export function getPauseBtn(game, vp) {
+const WAVE_CONTROL_GAP = 4;
+
+/** Slower | Pause | Faster in the same slot as Start Wave (active wave only). */
+export function getWaveControlRects(game, vp) {
     if (game.phase !== 'wave' || game.gameOver || game.victory || game.phase === 'victory_offer') return null;
-    return getSidebarPhaseBtnRect(vp);
+    const row = getSidebarPhaseBtnRect(vp);
+    const bw = (row.w - 2 * WAVE_CONTROL_GAP) / 3;
+    const { x, y, h } = row;
+    return {
+        row,
+        slower: { x, y, w: bw, h },
+        pause: { x: x + bw + WAVE_CONTROL_GAP, y, w: bw, h },
+        faster: { x: x + 2 * bw + 2 * WAVE_CONTROL_GAP, y, w: bw, h },
+    };
 }
 
-export function hitPauseSidebarBtn(game, px, py, vp) {
-    const b = getPauseBtn(game, vp);
-    if (!b) return false;
-    return px >= b.x && px <= b.x + b.w && py >= b.y && py <= b.y + b.h;
+/** Returns true if click was on a wave control (slower / pause / faster). */
+export function tryConsumeWaveControlClick(game, clickX, clickY, vp) {
+    const r = getWaveControlRects(game, vp);
+    if (!r) return false;
+    if (hitTest(clickX, clickY, r.slower)) {
+        if (game.speedIndex > 0) {
+            game.speedIndex--;
+            if (game.audio) game.audio.playClick();
+        }
+        return true;
+    }
+    if (hitTest(clickX, clickY, r.faster)) {
+        if (game.speedIndex < GAME_SPEED_LEVELS.length - 1) {
+            game.speedIndex++;
+            if (game.audio) game.audio.playClick();
+        }
+        return true;
+    }
+    if (hitTest(clickX, clickY, r.pause)) {
+        game.paused = !game.paused;
+        if (game.audio) game.audio.playClick();
+        return true;
+    }
+    return false;
 }
 
 const SCREEN_BACK_BTN_R = 22;
@@ -754,13 +786,21 @@ export function renderStartWaveBtn(ctx, game, vp) {
         drawButton(ctx, prepBtn.x, prepBtn.y, prepBtn.w, prepBtn.h, label, '#E74C3C', true);
         return;
     }
-    const pauseBtn = getPauseBtn(game, vp);
-    if (pauseBtn) {
-        const label = game.paused
-            ? (vp.touchHandheld ? 'Resume' : 'Resume [P]')
-            : (vp.touchHandheld ? 'Pause' : 'Pause [P]');
-        const color = game.paused ? '#3498DB' : '#F39C12';
-        drawButton(ctx, pauseBtn.x, pauseBtn.y, pauseBtn.w, pauseBtn.h, label, color, true);
+    const wave = getWaveControlRects(game, vp);
+    if (wave) {
+        const narrow = vp.compactSidebar || vp.touchHandheld || wave.pause.w < 100;
+        const slowLabel = narrow ? '-' : 'Slower';
+        const fastLabel = narrow ? '+' : 'Faster';
+        drawButton(ctx, wave.slower.x, wave.slower.y, wave.slower.w, wave.slower.h,
+            slowLabel, '#7F8C8D', game.speedIndex > 0);
+        const pauseLabel = game.paused
+            ? (narrow ? 'Resume' : 'Resume [P]')
+            : (narrow ? 'Pause' : 'Pause [P]');
+        const pauseColor = game.paused ? '#3498DB' : '#F39C12';
+        drawButton(ctx, wave.pause.x, wave.pause.y, wave.pause.w, wave.pause.h,
+            pauseLabel, pauseColor, true);
+        drawButton(ctx, wave.faster.x, wave.faster.y, wave.faster.w, wave.faster.h,
+            fastLabel, '#7F8C8D', game.speedIndex < GAME_SPEED_LEVELS.length - 1);
     }
 }
 
@@ -800,10 +840,7 @@ export function handleGameClick(game, clickX, clickY, input, vp) {
         return;
     }
 
-    const pauseBtn = getPauseBtn(game, vp);
-    if (pauseBtn && hitTest(clickX, clickY, pauseBtn)) {
-        if (game.audio) game.audio.playClick();
-        game.paused = true;
+    if (tryConsumeWaveControlClick(game, clickX, clickY, vp)) {
         return;
     }
 

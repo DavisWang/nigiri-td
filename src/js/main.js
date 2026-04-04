@@ -8,7 +8,7 @@ import { AudioManager } from './audio.js';
 import {
     renderGame, renderStartWaveBtn, renderTitleMenuBtn, renderOverlay,
     handleGameClick, renderAudioToggle, getAudioBtnRect, hitTitleMenuBtn,
-    hitScreenBackButton, renderScreenBackButton, hitPauseResumeBtn, hitPauseSidebarBtn,
+    hitScreenBackButton, renderScreenBackButton, hitPauseResumeBtn, tryConsumeWaveControlClick,
 } from './ui.js';
 import {
     drawTower, drawButton, drawNigiri, drawBeltTile,
@@ -264,7 +264,7 @@ function update(dt) {
         }
     } else if (screen === 'gameplay') {
         if (!game.paused) {
-            game.update(dt);
+            game.update(dt * game.getTimeScale());
         }
 
         const click = input.consumeClick();
@@ -302,10 +302,11 @@ function update(dt) {
                     screen = 'title';
                     game.reset();
                     startBgmIfUnmuted();
-                } else if (hitPauseResumeBtn(game, click.x, click.y) ||
-                    hitPauseSidebarBtn(game, click.x, click.y, vpPaused)) {
+                } else if (hitPauseResumeBtn(game, click.x, click.y)) {
                     audio.playClick();
                     game.paused = false;
+                } else if (tryConsumeWaveControlClick(game, click.x, click.y, vpPaused)) {
+                    /* click sound inside handler */
                 }
             } else {
                 if (hitTitleMenuBtn(click.x, click.y, game)) {

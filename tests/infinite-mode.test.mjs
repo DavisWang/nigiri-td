@@ -32,16 +32,17 @@ function approx(a, b, eps = 1e-9) {
 
 // --- Scalers (agreed design) ---
 assert(approx(getInfiniteHpMult(1), 1), 'HP k=1 is 1');
-assert(approx(getInfiniteHpMult(2), 1.06), 'HP k=2 is 1.06');
-assert(approx(getInfiniteHpMult(5), 1.06 ** 4), 'HP k=5 is 1.06^4');
+assert(approx(getInfiniteHpMult(2), 1.1), 'HP k=2 is 1.1');
+assert(approx(getInfiniteHpMult(5), 1.1 ** 4), 'HP k=5 is 1.1^4');
 
 assert(approx(getInfiniteSpeedMult(1), 1), 'Speed k=1 is 1');
-assert(approx(getInfiniteSpeedMult(2), 1.015), 'Speed k=2 is 1.015');
-assert(approx(getInfiniteSpeedMult(999), 1.28), 'Speed caps at 1.28');
+assert(approx(getInfiniteSpeedMult(2), 1 + 1 / 19), 'Speed k=2 is 1 + 1/19');
+assert(approx(getInfiniteSpeedMult(20), 2), 'Speed k=20 is 2×');
+assert(approx(getInfiniteSpeedMult(999), 2), 'Speed caps at 2×');
 
-assert(approx(getInfiniteMoneyMult(1), 1), 'Money k=1 is 1');
-assert(approx(getInfiniteMoneyMult(2), 0.85), 'Money k=2 is 0.85');
-assert(getInfiniteMoneyMult(200) === 0.1, 'Money floors at 0.1');
+assert(approx(getInfiniteMoneyMult(1), 0.5), 'Money k=1 is 0.5× start');
+assert(approx(getInfiniteMoneyMult(2), 0.5 * 0.85), 'Money k=2 is 0.5×0.85');
+assert(getInfiniteMoneyMult(500) === 0.05, 'Money floors at 0.05');
 
 assert(approx(getInfiniteSpawnIntervalMult(1), 1), 'Spawn k=1 is 1');
 assert(approx(getInfiniteSpawnIntervalMult(2), 0.985), 'Spawn k=2 is 0.985');
