@@ -42,7 +42,7 @@ npm install
 npm test
 ```
 
-Tests are Node-based checks for map paths, belt tile orientation, sidebar layout, round ladder, and **infinite-mode** scalers / wave template (no browser required).
+Tests are Node-based checks for map paths, belt tile orientation, sidebar layout, round ladder, **infinite-mode** scalers / wave template, and **test mode** (same rounds / victory offer as a normal run, unlimited money only — no browser required).
 
 ## Project layout
 

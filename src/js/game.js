@@ -1,5 +1,5 @@
 import {
-    STARTING_MONEY, STARTING_LIFE, TEST_ROUND_DATA, TOWER_DATA, ENEMY_DATA,
+    STARTING_MONEY, STARTING_LIFE, TOWER_DATA, ENEMY_DATA,
     GRID_COLS, GRID_ROWS,
     getTotalCost, getSellValue, getUpgradeCost, getRoundBonus, buildSpawnQueue,
     MapContext, getMapById, getDifficultyProfile,
@@ -48,7 +48,7 @@ export class GameState {
         this.totalEarned = 0;
         this.roundEaten = 0;
         this.roundEarned = 0;
-        this._roundData = testMode ? TEST_ROUND_DATA : this.mapCtx.def.rounds;
+        this._roundData = this.mapCtx.def.rounds;
     }
 
     getTimeScale() {
@@ -245,14 +245,8 @@ export class GameState {
         this.effects.addBanner(`Round Complete! +${bonus} bonus`);
 
         if (this.round >= this._roundData.length) {
-            if (!this.testMode) {
-                this.phase = 'victory_offer';
-                if (this.audio) { this.audio.stopBGM(); this.audio.playVictory(); }
-            } else {
-                this.victory = true;
-                this.phase = 'victory';
-                if (this.audio) { this.audio.stopBGM(); this.audio.playVictory(); }
-            }
+            this.phase = 'victory_offer';
+            if (this.audio) { this.audio.stopBGM(); this.audio.playVictory(); }
         } else {
             this.phase = 'prep';
             if (this.audio) this.audio.playRoundComplete();

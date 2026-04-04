@@ -9,7 +9,7 @@ Conveyor sushi heads toward the trash. You place **animals** on buildable seats 
 **Title** → **Map** → **Difficulty** (Easy / Intermediate / Hard) → **Gameplay** → after round 10, **victory offer** (infinite or end run) → title or retry on game over / victory.
 
 - **How to Play** on the title is optional flavor text plus a tiny belt vignette.
-- **Test Mode** (title) starts map select with lots of cash for experimenting.
+- **Test Mode** (title) is the same as a normal run (all 10 rounds per map, infinite mode, difficulty) except **unlimited money** for placing and upgrading.
 - **Crossroads** map includes extra starting money (see `startingMoneyBonus` in `data.js`).
 
 ## Controls
