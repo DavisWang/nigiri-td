@@ -11,6 +11,9 @@ import {
     drawGarbageBin, drawKitchenDoor, drawSeatIndicator, drawBeltTile,
     drawTierStars, drawSpeakerIcon,
 } from './sprites.js';
+import {
+    uiFont, t, formatSpecialLocalized, mapName, difficultyLabel, towerName, towerDesc,
+} from './i18n.js';
 
 /** Larger type + tap targets on portrait phones (width-limited scale). Landscape/tablet use `compact === false`. */
 function getSidebarMetrics(compact) {
@@ -279,15 +282,15 @@ function renderSidebar(ctx, game, input, m) {
 function renderMapInfo(ctx, game, m) {
     const x = SIDEBAR_X + 12;
     ctx.fillStyle = COLORS.textPrimary;
-    ctx.font = m.fontMapName;
     ctx.textAlign = 'left';
     ctx.textBaseline = 'middle';
-    ctx.fillText(game.mapCtx.def.name, x, m.mapY);
+    ctx.font = uiFont(m.fontMapName);
+    ctx.fillText(mapName(game.mapCtx.def.id), x, m.mapY);
     const diff = getDifficultyProfile(game.difficultyId);
-    ctx.font = m.fontDiff;
+    ctx.font = uiFont(m.fontDiff);
     ctx.fillStyle = diff.accent;
     ctx.textAlign = 'right';
-    ctx.fillText(diff.label, SIDEBAR_X + SIDEBAR_WIDTH - 12, m.mapY);
+    ctx.fillText(difficultyLabel(game.difficultyId), SIDEBAR_X + SIDEBAR_WIDTH - 12, m.mapY);
     ctx.textAlign = 'left';
     ctx.fillStyle = COLORS.textPrimary;
 }
@@ -300,7 +303,7 @@ function renderHUD(ctx, game, m) {
 
     drawCoin(ctx, startX + 10, rowY, m.coinR);
     ctx.fillStyle = COLORS.money;
-    ctx.font = m.fontMoney;
+    ctx.font = uiFont(m.fontMoney);
     ctx.textAlign = 'left';
     ctx.textBaseline = 'middle';
     const moneyStr = `${game.money}`;
@@ -312,7 +315,7 @@ function renderHUD(ctx, game, m) {
     const heartSize = m.heartR;
     let heartSpacing = m.heartSpacingMax;
 
-    ctx.font = m.fontLife;
+    ctx.font = uiFont(m.fontLife);
     const lifeStr = `${game.life}`;
     const lifeW = ctx.measureText(lifeStr).width;
     const padBeforeLife = 8;
@@ -339,7 +342,7 @@ function renderHUD(ctx, game, m) {
     ctx.globalAlpha = 1.0;
 
     ctx.fillStyle = COLORS.life;
-    ctx.font = m.fontLife;
+    ctx.font = uiFont(m.fontLife);
     ctx.textAlign = 'right';
     ctx.textBaseline = 'middle';
     ctx.fillText(lifeStr, rightX, rowY);
@@ -351,14 +354,15 @@ function renderRoundInfo(ctx, game, m) {
     const y = m.roundY;
 
     ctx.fillStyle = COLORS.textPrimary;
-    ctx.font = m.fontRound;
+    ctx.font = uiFont(m.fontRound);
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     const totalRounds = game._roundData.length;
     if (game.infiniteMode && game.round >= totalRounds) {
-        ctx.fillText(`Round ${10 + game.infiniteRound} · ∞`, x, y);
+        ctx.fillText(t('roundSidebarInfinite', { n: 10 + game.infiniteRound }), x, y);
     } else {
-        ctx.fillText(`Round ${Math.min(game.round + 1, totalRounds)} / ${totalRounds}`, x, y);
+        const cur = Math.min(game.round + 1, totalRounds);
+        ctx.fillText(`${t('round')} ` + t('roundOf', { cur, total: totalRounds }), x, y);
     }
 }
 
@@ -373,10 +377,10 @@ function renderWavePreview(ctx, game, m) {
     const countOffset = Math.round(nr * 0.8);
 
     ctx.fillStyle = COLORS.textPrimary;
-    ctx.font = m.fontWaveLabel;
+    ctx.font = uiFont(m.fontWaveLabel);
     ctx.textAlign = 'left';
     ctx.textBaseline = 'middle';
-    ctx.fillText('Incoming:', startX, y);
+    ctx.fillText(t('incoming'), startX, y);
 
     let px = startX;
     const py = m.waveRowY;
@@ -384,7 +388,7 @@ function renderWavePreview(ctx, game, m) {
         drawNigiri(ctx, px + 10, py, nr, item.data, 1.0);
 
         ctx.fillStyle = COLORS.textPrimary;
-        ctx.font = m.fontWaveCount;
+        ctx.font = uiFont(m.fontWaveCount);
         ctx.textAlign = 'left';
         ctx.textBaseline = 'middle';
         ctx.fillText(`×${item.count}`, px + countOffset, py);
@@ -400,10 +404,10 @@ function renderTowerShop(ctx, game, input, m) {
     const { shopStartY: sy, shopCols, shopItemW, shopItemH, shopGap } = m;
 
     ctx.fillStyle = COLORS.textPrimary;
-    ctx.font = m.fontShopTitle;
+    ctx.font = uiFont(m.fontShopTitle);
     ctx.textAlign = 'left';
     ctx.textBaseline = 'middle';
-    ctx.fillText('Tower Shop', startX, sy - 15);
+    ctx.fillText(t('towerShop'), startX, sy - 15);
 
     ctx.strokeStyle = COLORS.sidebarBorder;
     ctx.lineWidth = 0.5;
@@ -444,51 +448,19 @@ function renderTowerShop(ctx, game, input, m) {
 
         ctx.globalAlpha = showBright ? 1.0 : 0.48;
         ctx.fillStyle = COLORS.textPrimary;
-        ctx.font = m.fontTowerName;
+        ctx.font = uiFont(m.fontTowerName);
         ctx.textAlign = 'right';
         ctx.textBaseline = 'top';
         const nameY = shopItemH >= 50 ? y + 9 : y + 8;
-        ctx.fillText(td.name, x + shopItemW - 8, nameY);
+        ctx.fillText(towerName(td.id), x + shopItemW - 8, nameY);
 
         ctx.fillStyle = affordable ? '#4CAF50' : COLORS.textAccent;
-        ctx.font = m.fontTowerCost;
+        ctx.font = uiFont(m.fontTowerCost);
         ctx.textAlign = 'right';
         const costY = shopItemH >= 50 ? y + 28 : y + 26;
         ctx.fillText(`$${td.tiers[0].cost}`, x + shopItemW - 8, costY);
 
         ctx.globalAlpha = 1.0;
-    }
-}
-
-function formatSpecial(special) {
-    if (!special) return null;
-    switch (special.type) {
-        case 'doubleBite': return `${Math.round(special.chance * 100)}% double-bite`;
-        case 'bonusMoney': return `+${Math.round(special.mult * 100)}% kill money`;
-        case 'slow': return `${Math.round(special.pct * 100)}% slow ${special.dur / 1000}s`;
-        case 'pierce': return `Pierce \u00d7${special.count}`;
-        case 'crit': return `${Math.round(special.chance * 100)}% crit (\u00d7${special.mult} dmg)`;
-        case 'multiTarget': {
-            let t = `Hits ${special.count} targets`;
-            if (special.slow) t += ` + ${Math.round(special.slow.pct * 100)}% slow`;
-            return t;
-        }
-        case 'aura': {
-            let t = `+${Math.round(special.speedBuff * 100)}% adj speed`;
-            if (special.damageBuff) t += `, +${Math.round(special.damageBuff * 100)}% adj dmg`;
-            return t;
-        }
-        case 'stun': {
-            let t = `${Math.round(special.chance * 100)}% stun ${special.dur / 1000}s`;
-            if (special.splash) t += ' + splash';
-            return t;
-        }
-        case 'aoe': {
-            let t = `AoE ${special.radius} tile`;
-            if (special.burn) t += ` + burn ${special.burn.dps}/s`;
-            return t;
-        }
-        default: return null;
     }
 }
 
@@ -521,10 +493,10 @@ function renderSelectedInfo(ctx, game, m) {
     ctx.restore();
 
     ctx.fillStyle = COLORS.textPrimary;
-    ctx.font = m.fontSelTitle;
+    ctx.font = uiFont(m.fontSelTitle);
     ctx.textAlign = 'left';
     ctx.textBaseline = 'top';
-    ctx.fillText(tower.typeData.name, textX, cy);
+    ctx.fillText(towerName(tower.id), textX, cy);
     {
         const starGap = 14;
         const starOuterR = 5;
@@ -535,16 +507,16 @@ function renderSelectedInfo(ctx, game, m) {
     cy += 20;
 
     const buffed = tower.getBuffedStats(game.towers);
-    ctx.font = m.fontSelStat;
+    ctx.font = uiFont(m.fontSelStat);
     ctx.fillStyle = '#555';
-    ctx.fillText(`DMG ${buffed.damage}`, textX, cy);
-    ctx.fillText(`RNG ${buffed.range}`, textX + 68, cy);
-    ctx.fillText(`SPD ${buffed.speed}ms`, textX + 136, cy);
+    ctx.fillText(`${t('dmg')} ${buffed.damage}`, textX, cy);
+    ctx.fillText(`${t('rng')} ${buffed.range}`, textX + 68, cy);
+    ctx.fillText(`${t('spd')} ${buffed.speed}ms`, textX + 136, cy);
     cy += 16;
 
-    const specialText = formatSpecial(buffed.special);
+    const specialText = formatSpecialLocalized(buffed.special);
     if (specialText) {
-        ctx.font = m.fontSelSpecial;
+        ctx.font = uiFont(m.fontSelSpecial);
         ctx.fillStyle = '#9C27B0';
         ctx.fillText(specialText, textX, cy);
     }
@@ -557,39 +529,40 @@ function renderSelectedInfo(ctx, game, m) {
         const rngDiff = +(next.range - curr.range).toFixed(1);
         const spdDiff = next.speed - curr.speed;
 
-        ctx.font = m.fontSelNext;
+        ctx.font = uiFont(m.fontSelNext);
         let dx = textX;
         ctx.fillStyle = '#AAA';
-        ctx.fillText('Next:', dx, cy);
-        dx += 32;
+        const nextLabel = t('next');
+        ctx.fillText(nextLabel, dx, cy);
+        dx += ctx.measureText(nextLabel).width + 6;
         if (dmgDiff !== 0) {
             ctx.fillStyle = dmgDiff > 0 ? '#4CAF50' : '#E74C3C';
-            const label = `DMG ${dmgDiff > 0 ? '+' : ''}${dmgDiff}`;
+            const label = `${t('dmg')} ${dmgDiff > 0 ? '+' : ''}${dmgDiff}`;
             ctx.fillText(label, dx, cy);
             dx += ctx.measureText(label).width + 6;
         }
         if (rngDiff !== 0) {
             ctx.fillStyle = rngDiff > 0 ? '#4CAF50' : '#E74C3C';
-            const label = `RNG ${rngDiff > 0 ? '+' : ''}${rngDiff}`;
+            const label = `${t('rng')} ${rngDiff > 0 ? '+' : ''}${rngDiff}`;
             ctx.fillText(label, dx, cy);
             dx += ctx.measureText(label).width + 6;
         }
         if (spdDiff !== 0) {
             ctx.fillStyle = spdDiff < 0 ? '#4CAF50' : '#E74C3C';
-            ctx.fillText(`SPD ${spdDiff}`, dx, cy);
+            ctx.fillText(t('spdDelta', { n: spdDiff }), dx, cy);
         }
         cy += 14;
-        const nextSpecial = formatSpecial(next.special);
-        const currSpecial = formatSpecial(curr.special);
+        const nextSpecial = formatSpecialLocalized(next.special);
+        const currSpecial = formatSpecialLocalized(curr.special);
         if (nextSpecial && nextSpecial !== currSpecial) {
             ctx.fillStyle = '#9C27B0';
-            ctx.font = m.fontSelHint;
+            ctx.font = uiFont(m.fontSelHint);
             ctx.fillText(`\u2192 ${nextSpecial}`, textX + 32, cy);
         }
     } else {
-        ctx.font = m.fontSelNext;
+        ctx.font = uiFont(m.fontSelNext);
         ctx.fillStyle = '#999';
-        ctx.fillText('Fully upgraded', textX, cy);
+        ctx.fillText(t('fullyUpgraded'), textX, cy);
     }
     cy += 16;
 
@@ -597,18 +570,18 @@ function renderSelectedInfo(ctx, game, m) {
     if (tower.canUpgrade()) {
         const cost = tower.getUpgradeCost();
         const canAfford = game.money >= cost || game.testMode;
-        game._upgradeBtn = drawButton(ctx, x + 2, cy, btnW, btnH, `Upgrade $${cost}`, '#4CAF50', canAfford);
+        game._upgradeBtn = drawButton(ctx, x + 2, cy, btnW, btnH, t('upgrade', { cost }), '#4CAF50', canAfford);
     } else {
-        game._upgradeBtn = drawButton(ctx, x + 2, cy, btnW, btnH, 'MAX', '#9E9E9E', false);
+        game._upgradeBtn = drawButton(ctx, x + 2, cy, btnW, btnH, t('max'), '#9E9E9E', false);
     }
     const sellVal = tower.getSellValue();
-    game._sellBtn = drawButton(ctx, x + 6 + btnW, cy, btnW, btnH, `Sell $${sellVal}`, '#F44336', true);
+    game._sellBtn = drawButton(ctx, x + 6 + btnW, cy, btnW, btnH, t('sell', { val: sellVal }), '#F44336', true);
     cy += btnH + 8;
 
-    ctx.font = m.fontSelHint;
+    ctx.font = uiFont(m.fontSelHint);
     ctx.fillStyle = '#AAA';
     ctx.textAlign = 'center';
-    ctx.fillText('[U] Upgrade  [S] Sell  [Esc] Deselect', SIDEBAR_X + SIDEBAR_WIDTH / 2, cy);
+    ctx.fillText(t('selHints'), SIDEBAR_X + SIDEBAR_WIDTH / 2, cy);
 }
 
 function renderPlacingInfo(ctx, game, m) {
@@ -642,33 +615,33 @@ function renderPlacingInfo(ctx, game, m) {
     ctx.restore();
 
     ctx.fillStyle = COLORS.textPrimary;
-    ctx.font = m.fontPlaceTitle;
+    ctx.font = uiFont(m.fontPlaceTitle);
     ctx.textAlign = 'left';
     ctx.textBaseline = 'top';
-    ctx.fillText(td.name, textX, y + pad);
+    ctx.fillText(towerName(td.id), textX, y + pad);
 
-    ctx.font = m.fontPlaceDesc;
+    ctx.font = uiFont(m.fontPlaceDesc);
     ctx.fillStyle = '#999';
-    ctx.fillText(td.description, textX, y + pad + 16);
+    ctx.fillText(towerDesc(td.id), textX, y + pad + 16);
 
-    ctx.font = m.fontPlaceStat;
+    ctx.font = uiFont(m.fontPlaceStat);
     ctx.fillStyle = '#555';
-    ctx.fillText(`DMG ${base.damage}`, textX, y + pad + 36);
-    ctx.fillText(`RNG ${base.range}`, textX + 68, y + pad + 36);
-    ctx.fillText(`SPD ${base.speed}ms`, textX + 136, y + pad + 36);
+    ctx.fillText(`${t('dmg')} ${base.damage}`, textX, y + pad + 36);
+    ctx.fillText(`${t('rng')} ${base.range}`, textX + 68, y + pad + 36);
+    ctx.fillText(`${t('spd')} ${base.speed}ms`, textX + 136, y + pad + 36);
 
-    const specialText = formatSpecial(base.special);
+    const specialText = formatSpecialLocalized(base.special);
     if (specialText) {
-        ctx.font = m.fontPlaceSpecial;
+        ctx.font = uiFont(m.fontPlaceSpecial);
         ctx.fillStyle = '#9C27B0';
         ctx.fillText(specialText, textX, y + pad + 52);
     }
 
     if (showNeedFunds) {
-        ctx.font = m.fontPlaceNeed;
+        ctx.font = uiFont(m.fontPlaceNeed);
         ctx.fillStyle = COLORS.textAccent;
         ctx.textAlign = 'left';
-        ctx.fillText(`Need $${base.cost} to place (preview)`, textX, y + panelH - 14);
+        ctx.fillText(t('needFunds', { cost: base.cost }), textX, y + panelH - 14);
     }
 }
 
@@ -782,20 +755,20 @@ export function renderTitleMenuBtn(ctx, game, mouseX, mouseY) {
 export function renderStartWaveBtn(ctx, game, vp) {
     const prepBtn = getStartWaveBtn(game, vp);
     if (prepBtn) {
-        const label = vp.touchHandheld ? 'Start Wave' : 'Start Wave [Space]';
+        const label = vp.touchHandheld ? t('startWave') : t('startWaveKey');
         drawButton(ctx, prepBtn.x, prepBtn.y, prepBtn.w, prepBtn.h, label, '#E74C3C', true);
         return;
     }
     const wave = getWaveControlRects(game, vp);
     if (wave) {
         const narrow = vp.compactSidebar || vp.touchHandheld || wave.pause.w < 100;
-        const slowLabel = narrow ? '-' : 'Slower';
-        const fastLabel = narrow ? '+' : 'Faster';
+        const slowLabel = narrow ? t('minus') : t('slower');
+        const fastLabel = narrow ? t('plus') : t('faster');
         drawButton(ctx, wave.slower.x, wave.slower.y, wave.slower.w, wave.slower.h,
             slowLabel, '#7F8C8D', game.speedIndex > 0);
         const pauseLabel = game.paused
-            ? (narrow ? 'Resume' : 'Resume [P]')
-            : (narrow ? 'Pause' : 'Pause [P]');
+            ? (narrow ? t('resume') : t('resumeKey'))
+            : (narrow ? t('pause') : t('pauseKey'));
         const pauseColor = game.paused ? '#3498DB' : '#F39C12';
         drawButton(ctx, wave.pause.x, wave.pause.y, wave.pause.w, wave.pause.h,
             pauseLabel, pauseColor, true);
@@ -920,26 +893,29 @@ export function renderOverlay(ctx, game) {
         ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
         ctx.fillStyle = '#F1C40F';
-        ctx.font = `bold 36px 'Arial Rounded MT Bold', sans-serif`;
+        ctx.font = uiFont(`bold 36px 'Arial Rounded MT Bold', sans-serif`);
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         ctx.strokeStyle = '#333';
         ctx.lineWidth = 2;
-        ctx.strokeText('All 10 rounds cleared!', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 - 100);
-        ctx.fillText('All 10 rounds cleared!', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 - 100);
+        const v10 = t('victory10');
+        ctx.strokeText(v10, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 - 100);
+        ctx.fillText(v10, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 - 100);
 
         ctx.fillStyle = '#EEE';
-        ctx.font = `15px 'Arial Rounded MT Bold', sans-serif`;
+        ctx.font = uiFont(`15px 'Arial Rounded MT Bold', sans-serif`);
         ctx.lineWidth = 1;
-        ctx.fillText('Infinite mode: enemies scale each round. There is no final wave.', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 - 58);
-        ctx.fillText('How far can you go?', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 - 34);
+        ctx.fillText(t('victoryInfiniteBlurb'), CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 - 58);
+        ctx.fillText(t('victoryHowFar'), CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 - 34);
 
+        const offerW = 300;
+        const offerX = CANVAS_WIDTH / 2 - offerW / 2;
         game._continueInfiniteBtn = drawButton(ctx,
-            CANVAS_WIDTH / 2 - 130, CANVAS_HEIGHT / 2 + 8,
-            260, 44, 'Continue · Infinite', '#9B59B6', true);
+            offerX, CANVAS_HEIGHT / 2 + 8,
+            offerW, 44, t('btnContinueInfinite'), '#9B59B6', true);
         game._declineInfiniteBtn = drawButton(ctx,
-            CANVAS_WIDTH / 2 - 130, CANVAS_HEIGHT / 2 + 62,
-            260, 40, 'End Run (Victory)', '#4CAF50', true);
+            offerX, CANVAS_HEIGHT / 2 + 62,
+            offerW, 40, t('btnEndVictory'), '#4CAF50', true);
     }
 
     if (game.gameOver) {
@@ -947,22 +923,23 @@ export function renderOverlay(ctx, game) {
         ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
         ctx.fillStyle = '#E74C3C';
-        ctx.font = `bold 48px 'Arial Rounded MT Bold', sans-serif`;
+        ctx.font = uiFont(`bold 48px 'Arial Rounded MT Bold', sans-serif`);
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         ctx.strokeStyle = '#333';
         ctx.lineWidth = 3;
-        ctx.strokeText('Game Over', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 - 60);
-        ctx.fillText('Game Over', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 - 60);
+        const go = t('gameOver');
+        ctx.strokeText(go, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 - 60);
+        ctx.fillText(go, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 - 60);
 
         ctx.fillStyle = '#FFFFFF';
-        ctx.font = `18px 'Arial Rounded MT Bold', sans-serif`;
-        ctx.fillText(`Rounds Survived: ${game.getRoundsSurvived()}`, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2);
-        ctx.fillText(`Nigiri Eaten: ${game.totalEaten}`, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 30);
+        ctx.font = uiFont(`18px 'Arial Rounded MT Bold', sans-serif`);
+        ctx.fillText(t('roundsSurvived', { n: game.getRoundsSurvived() }), CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2);
+        ctx.fillText(t('nigiriEaten', { n: game.totalEaten }), CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 30);
 
         game._retryBtn = drawButton(ctx,
-            CANVAS_WIDTH / 2 - 70, CANVAS_HEIGHT / 2 + 65,
-            140, 40, 'Try Again', '#E74C3C', true);
+            CANVAS_WIDTH / 2 - 75, CANVAS_HEIGHT / 2 + 65,
+            150, 40, t('tryAgain'), '#E74C3C', true);
     }
 
     if (game.victory) {
@@ -983,23 +960,24 @@ export function renderOverlay(ctx, game) {
         ctx.globalAlpha = 1.0;
 
         ctx.fillStyle = '#F1C40F';
-        ctx.font = `bold 48px 'Arial Rounded MT Bold', sans-serif`;
+        ctx.font = uiFont(`bold 48px 'Arial Rounded MT Bold', sans-serif`);
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         ctx.strokeStyle = '#333';
         ctx.lineWidth = 3;
-        ctx.strokeText('Victory!', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 - 60);
-        ctx.fillText('Victory!', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 - 60);
+        const vic = t('victory');
+        ctx.strokeText(vic, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 - 60);
+        ctx.fillText(vic, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 - 60);
 
         ctx.fillStyle = '#FFFFFF';
-        ctx.font = `18px 'Arial Rounded MT Bold', sans-serif`;
-        ctx.fillText(`Nigiri Eaten: ${game.totalEaten}`, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2);
-        ctx.fillText(`Total Earned: $${game.totalEarned}`, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 30);
-        ctx.fillText(`Life Remaining: ${game.life}`, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 60);
+        ctx.font = uiFont(`18px 'Arial Rounded MT Bold', sans-serif`);
+        ctx.fillText(t('nigiriEaten', { n: game.totalEaten }), CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2);
+        ctx.fillText(t('totalEarned', { n: game.totalEarned }), CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 30);
+        ctx.fillText(t('lifeRemaining', { n: game.life }), CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 60);
 
         game._retryBtn = drawButton(ctx,
-            CANVAS_WIDTH / 2 - 80, CANVAS_HEIGHT / 2 + 90,
-            160, 40, 'Back to Title', '#4CAF50', true);
+            CANVAS_WIDTH / 2 - 90, CANVAS_HEIGHT / 2 + 90,
+            180, 40, t('backToTitle'), '#4CAF50', true);
     }
 
     if (game.paused && !game.gameOver && !game.victory && game.phase !== 'victory_offer') {
@@ -1007,21 +985,22 @@ export function renderOverlay(ctx, game) {
         ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
         ctx.fillStyle = '#FFFFFF';
-        ctx.font = `bold 44px 'Arial Rounded MT Bold', sans-serif`;
+        ctx.font = uiFont(`bold 44px 'Arial Rounded MT Bold', sans-serif`);
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         ctx.strokeStyle = '#333';
         ctx.lineWidth = 3;
-        ctx.strokeText('Paused', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 - 28);
-        ctx.fillText('Paused', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 - 28);
+        const pz = t('paused');
+        ctx.strokeText(pz, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 - 28);
+        ctx.fillText(pz, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 - 28);
 
-        ctx.font = `16px 'Arial Rounded MT Bold', sans-serif`;
+        ctx.font = uiFont(`16px 'Arial Rounded MT Bold', sans-serif`);
         ctx.lineWidth = 1;
         ctx.fillStyle = '#EEE';
-        ctx.fillText('[P] or Esc to resume', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 14);
+        ctx.fillText(t('pauseResumeHint'), CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 14);
 
         game._pauseResumeBtn = drawButton(ctx,
             CANVAS_WIDTH / 2 - 80, CANVAS_HEIGHT / 2 + 44,
-            160, 40, 'Resume', '#3498DB', true);
+            160, 40, t('resumeBtn'), '#3498DB', true);
     }
 }

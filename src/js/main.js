@@ -2,6 +2,10 @@ import {
     CANVAS_WIDTH, CANVAS_HEIGHT, COLORS, ENEMY_DATA, MAP_DEFINITIONS, GRID_COLS, GRID_ROWS, MapContext,
     DIFFICULTY_ORDER, DIFFICULTY_PROFILES, getMapById,
 } from './data.js';
+import {
+    t, uiFont, mapName, difficultyLabel, difficultyHint,
+    renderTitleLangButton, hitTitleLangButton, toggleLocale,
+} from './i18n.js';
 import { InputManager } from './input.js';
 import { GameState } from './game.js';
 import { AudioManager } from './audio.js';
@@ -125,6 +129,12 @@ function update(dt) {
         const click = input.consumeClick();
         if (click) {
             if (handleAudioToggleClick(click)) return;
+            if (hitTitleLangButton(click.x, click.y)) {
+                audio._ensureContext();
+                audio.playClick();
+                toggleLocale();
+                return;
+            }
             for (let i = 0; i < 3; i++) {
                 const b = getMainMenuButtonRect(i);
                 if (click.x >= b.x && click.x <= b.x + b.w &&
@@ -382,10 +392,10 @@ function renderHowToPlay() {
 
     const cx = CANVAS_WIDTH / 2;
     ctx.fillStyle = '#E74C3C';
-    ctx.font = `bold 32px 'Arial Rounded MT Bold', sans-serif`;
+    ctx.font = uiFont(`bold 32px 'Arial Rounded MT Bold', sans-serif`);
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText('How to Play', cx, 44);
+    ctx.fillText(t('howToTitle'), cx, 44);
 
     const beltY = 108;
     const tile = 42;
@@ -423,28 +433,24 @@ function renderHowToPlay() {
     const iconY = crewY + 52;
     drawHeart(ctx, cx - 88, iconY, 26);
     drawCoin(ctx, cx + 88, iconY, 24);
-    ctx.font = `12px sans-serif`;
+    ctx.font = uiFont(`12px sans-serif`);
     ctx.fillStyle = '#888';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText('hearts · cash', cx, iconY);
+    ctx.fillText(t('howToHeartsCash'), cx, iconY);
 
     ctx.fillStyle = COLORS.textPrimary;
-    ctx.font = `bold 18px 'Arial Rounded MT Bold', sans-serif`;
+    ctx.font = uiFont(`bold 18px 'Arial Rounded MT Bold', sans-serif`);
     ctx.textBaseline = 'top';
-    ctx.fillText('Sushi rolls toward the bin. Animals along the belt eat what they can.', cx, iconY + 28);
-    ctx.font = `15px 'Arial Rounded MT Bold', sans-serif`;
+    ctx.fillText(t('howToLine1'), cx, iconY + 28);
+    ctx.font = uiFont(`15px 'Arial Rounded MT Bold', sans-serif`);
     ctx.fillStyle = '#666';
-    ctx.fillText('Pick a map, difficulty, then place animals and start the wave.', cx, iconY + 52);
+    ctx.fillText(t('howToLine2'), cx, iconY + 52);
 
     const premiseY = iconY + 86;
     const premiseLineH = 23;
-    const premiseLines = [
-        'Small kaiten setup: belt runs toward the trash at the end.',
-        'Put animals next to the belt—they eat plates as they roll past.',
-        'Each wave is a little busier. See how far you get.',
-    ];
-    ctx.font = `15px 'Arial Rounded MT Bold', 'Nunito', sans-serif`;
+    const premiseLines = [t('howToPremise1'), t('howToPremise2'), t('howToPremise3')];
+    ctx.font = uiFont(`15px 'Arial Rounded MT Bold', 'Nunito', sans-serif`);
     ctx.fillStyle = '#5C5348';
     ctx.textBaseline = 'top';
     let py = premiseY;
@@ -454,12 +460,12 @@ function renderHowToPlay() {
     }
 
     const bb = getHowToPlayBackRect();
-    drawButton(ctx, bb.x, bb.y, bb.w, bb.h, 'Back', '#7F8C8D', true);
+    drawButton(ctx, bb.x, bb.y, bb.w, bb.h, t('btnBack'), '#7F8C8D', true);
 
     ctx.fillStyle = '#AAA';
-    ctx.font = `12px sans-serif`;
+    ctx.font = uiFont(`12px sans-serif`);
     ctx.textBaseline = 'middle';
-    ctx.fillText('Esc to return', cx, CANVAS_HEIGHT - 34);
+    ctx.fillText(t('escToReturn'), cx, CANVAS_HEIGHT - 34);
 }
 
 function render() {
@@ -519,27 +525,29 @@ function renderTitle() {
     ctx.shadowBlur = 8;
     ctx.shadowOffsetY = 3;
     ctx.fillStyle = '#E74C3C';
-    ctx.font = `bold 56px 'Arial Rounded MT Bold', 'Nunito', sans-serif`;
+    ctx.font = uiFont(`bold 56px 'Arial Rounded MT Bold', 'Nunito', sans-serif`);
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText('Nigiri TD', cx, CANVAS_HEIGHT * 0.18);
+    ctx.fillText(t('titleGame'), cx, CANVAS_HEIGHT * 0.18);
     ctx.restore();
 
     ctx.fillStyle = COLORS.textPrimary;
-    ctx.font = `20px 'Arial Rounded MT Bold', sans-serif`;
+    ctx.font = uiFont(`20px 'Arial Rounded MT Bold', sans-serif`);
     ctx.textAlign = 'center';
-    ctx.fillText('Defend the Sushi Counter!', cx, CANVAS_HEIGHT * 0.28);
+    ctx.fillText(t('titleTagline'), cx, CANVAS_HEIGHT * 0.28);
 
     const tb = getMainMenuButtonRect(0);
-    drawButton(ctx, tb.x, tb.y, tb.w, tb.h, 'New Game', '#E74C3C', true);
-    drawButton(ctx, getMainMenuButtonRect(1).x, getMainMenuButtonRect(1).y, tb.w, tb.h, 'How to Play', '#3498DB', true);
-    drawButton(ctx, getMainMenuButtonRect(2).x, getMainMenuButtonRect(2).y, tb.w, tb.h, 'Test Mode', '#7F8C8D', true);
+    drawButton(ctx, tb.x, tb.y, tb.w, tb.h, t('btnNewGame'), '#E74C3C', true);
+    drawButton(ctx, getMainMenuButtonRect(1).x, getMainMenuButtonRect(1).y, tb.w, tb.h, t('btnHowToPlay'), '#3498DB', true);
+    drawButton(ctx, getMainMenuButtonRect(2).x, getMainMenuButtonRect(2).y, tb.w, tb.h, t('btnTestMode'), '#7F8C8D', true);
 
     ctx.fillStyle = '#999';
-    ctx.font = `14px 'Arial Rounded MT Bold', sans-serif`;
+    ctx.font = uiFont(`14px 'Arial Rounded MT Bold', sans-serif`);
     ctx.textAlign = 'center';
     ctx.textBaseline = 'bottom';
-    ctx.fillText('By Pwner Studios', cx, CANVAS_HEIGHT - 20);
+    ctx.fillText(t('titleCredit'), cx, CANVAS_HEIGHT - 20);
+
+    renderTitleLangButton(ctx, input.mouseX, input.mouseY);
 }
 
 const CARD_W = 172;
@@ -579,10 +587,10 @@ function renderMapSelect() {
     ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
     ctx.fillStyle = '#E74C3C';
-    ctx.font = `bold 32px 'Arial Rounded MT Bold', sans-serif`;
+    ctx.font = uiFont(`bold 32px 'Arial Rounded MT Bold', sans-serif`);
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText(pendingTestMode ? 'Select Map (Test Mode)' : 'Select Map', CANVAS_WIDTH / 2, 40);
+    ctx.fillText(pendingTestMode ? t('mapSelectTest') : t('mapSelect'), CANVAS_WIDTH / 2, 40);
 
     const cards = getMapCardRects();
     for (let i = 0; i < MAP_DEFINITIONS.length; i++) {
@@ -590,9 +598,9 @@ function renderMapSelect() {
     }
 
     ctx.fillStyle = '#AAA';
-    ctx.font = `12px sans-serif`;
+    ctx.font = uiFont(`12px sans-serif`);
     ctx.textAlign = 'center';
-    ctx.fillText(`Press 1-${MAP_DEFINITIONS.length} to quick select  |  Esc to go back`, CANVAS_WIDTH / 2, CANVAS_HEIGHT - 30);
+    ctx.fillText(t('mapSelectHint', { n: MAP_DEFINITIONS.length }), CANVAS_WIDTH / 2, CANVAS_HEIGHT - 30);
 }
 
 function renderMapCard(ctx, rect, mapDef, hovered, idx) {
@@ -643,10 +651,10 @@ function renderMapCard(ctx, rect, mapDef, hovered, idx) {
     const textY = py + previewH + 10;
 
     ctx.fillStyle = COLORS.textPrimary;
-    ctx.font = `bold 13px 'Arial Rounded MT Bold', sans-serif`;
+    ctx.font = uiFont(`bold 13px 'Arial Rounded MT Bold', sans-serif`);
     ctx.textAlign = 'center';
     ctx.textBaseline = 'top';
-    ctx.fillText(mapDef.name, rect.x + rect.w / 2, textY);
+    ctx.fillText(mapName(mapDef.id), rect.x + rect.w / 2, textY);
 
     ctx.fillStyle = '#CCC';
     ctx.font = `10px sans-serif`;
@@ -679,14 +687,14 @@ function renderDifficultySelect() {
     const mapDef = getMapById(pendingMapId || 'kaiten');
 
     ctx.fillStyle = '#E74C3C';
-    ctx.font = `bold 28px 'Arial Rounded MT Bold', sans-serif`;
+    ctx.font = uiFont(`bold 28px 'Arial Rounded MT Bold', sans-serif`);
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText('Select Difficulty', CANVAS_WIDTH / 2, 38);
+    ctx.fillText(t('diffSelectTitle'), CANVAS_WIDTH / 2, 38);
 
     ctx.fillStyle = COLORS.textPrimary;
-    ctx.font = `bold 18px 'Arial Rounded MT Bold', sans-serif`;
-    ctx.fillText(mapDef.name, CANVAS_WIDTH / 2, 72);
+    ctx.font = uiFont(`bold 18px 'Arial Rounded MT Bold', sans-serif`);
+    ctx.fillText(mapName(mapDef.id), CANVAS_WIDTH / 2, 72);
 
     const rects = getDifficultySelectRects();
     for (let i = 0; i < rects.length; i++) {
@@ -702,14 +710,14 @@ function renderDifficultySelect() {
         ctx.stroke();
 
         ctx.fillStyle = prof.accent;
-        ctx.font = `bold 17px 'Arial Rounded MT Bold', sans-serif`;
+        ctx.font = uiFont(`bold 17px 'Arial Rounded MT Bold', sans-serif`);
         ctx.textAlign = 'left';
         ctx.textBaseline = 'middle';
-        ctx.fillText(prof.label, r.x + 18, r.y + r.h / 2 - 9);
+        ctx.fillText(difficultyLabel(r.id), r.x + 18, r.y + r.h / 2 - 9);
 
         ctx.fillStyle = '#777';
-        ctx.font = `12px sans-serif`;
-        ctx.fillText(prof.hint, r.x + 18, r.y + r.h / 2 + 11);
+        ctx.font = uiFont(`12px sans-serif`);
+        ctx.fillText(difficultyHint(r.id), r.x + 18, r.y + r.h / 2 + 11);
 
         ctx.fillStyle = '#CCC';
         ctx.font = `11px sans-serif`;
@@ -719,8 +727,8 @@ function renderDifficultySelect() {
 
     ctx.textAlign = 'center';
     ctx.fillStyle = '#AAA';
-    ctx.font = `12px sans-serif`;
-    ctx.fillText('Press 1–3 to choose  ·  Esc for map list', CANVAS_WIDTH / 2, CANVAS_HEIGHT - 28);
+    ctx.font = uiFont(`12px sans-serif`);
+    ctx.fillText(t('diffSelectFooter'), CANVAS_WIDTH / 2, CANVAS_HEIGHT - 28);
 }
 
 loadAllSprites().then(() => {

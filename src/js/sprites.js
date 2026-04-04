@@ -1,5 +1,6 @@
 import { CELL_SIZE, TIER_COLORS, COLORS } from './data.js';
 import { getSprite } from './sprite-loader.js';
+import { uiFont } from './i18n.js';
 
 export function drawTower(ctx, towerId, cx, cy, size, state) {
     const key = `${towerId}-${state === 'attack' ? 'attack' : 'idle'}`;
@@ -128,7 +129,7 @@ export function drawButton(ctx, x, y, w, h, text, color, enabled = true) {
     ctx.fill();
 
     ctx.fillStyle = '#FFFFFF';
-    ctx.font = `bold 16px 'Arial Rounded MT Bold', 'Nunito', sans-serif`;
+    ctx.font = uiFont(`bold 16px 'Arial Rounded MT Bold', 'Nunito', sans-serif`);
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillText(text, x + w / 2, y + h / 2 + 1);

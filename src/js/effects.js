@@ -1,3 +1,5 @@
+import { uiFont } from './i18n.js';
+
 export class EffectManager {
     constructor() {
         this.effects = [];
@@ -99,7 +101,7 @@ export class EffectManager {
             ctx.globalAlpha = alpha;
 
             if (e.type === 'float') {
-                ctx.font = `bold ${e.size}px 'Arial Rounded MT Bold', sans-serif`;
+                ctx.font = uiFont(`bold ${e.size}px 'Arial Rounded MT Bold', sans-serif`);
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
                 ctx.strokeStyle = '#333';
@@ -123,7 +125,7 @@ export class EffectManager {
                 ctx.fillStyle = 'rgba(0,0,0,0.6)';
                 ctx.fillRect(0, e.y - 5, w, 40);
                 ctx.fillStyle = '#FFFFFF';
-                ctx.font = `bold 24px 'Arial Rounded MT Bold', sans-serif`;
+                ctx.font = uiFont(`bold 24px 'Arial Rounded MT Bold', sans-serif`);
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
                 ctx.fillText(e.text, w / 2, e.y + 15);

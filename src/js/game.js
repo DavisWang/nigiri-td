@@ -9,6 +9,7 @@ import {
 } from './data.js';
 import { Tower, EnemySpawner } from './entities.js';
 import { EffectManager } from './effects.js';
+import { t } from './i18n.js';
 
 export class GameState {
     constructor(audio) {
@@ -99,7 +100,7 @@ export class GameState {
         if (!this.testMode && this.money < cost) return false;
         if (!this.testMode) this.money -= cost;
         tower.upgrade();
-        this.effects.addFloatingText(tower.x, tower.y - 10, 'UP!', '#4CAF50', 16);
+        this.effects.addFloatingText(tower.x, tower.y - 10, t('upgradePopup'), '#4CAF50', 16);
         if (this.audio) this.audio.playUpgrade();
         return true;
     }
@@ -122,7 +123,7 @@ export class GameState {
             this.phase = 'wave';
             this.roundEaten = 0;
             this.roundEarned = 0;
-            this.effects.addBanner(`Round ${10 + k} · Infinite`);
+            this.effects.addBanner(t('bannerRoundInf', { n: 10 + k }));
             if (this.audio) this.audio.playWaveStart();
             return;
         }
@@ -137,7 +138,7 @@ export class GameState {
         this.phase = 'wave';
         this.roundEaten = 0;
         this.roundEarned = 0;
-        this.effects.addBanner(`Round ${this.round + 1}`);
+        this.effects.addBanner(t('bannerRound', { n: this.round + 1 }));
         if (this.audio) this.audio.playWaveStart();
     }
 
@@ -227,7 +228,7 @@ export class GameState {
                 tower.attackAnimTimer = 0;
             }
 
-            this.effects.addBanner(`Round Complete! +${bonus} bonus`);
+            this.effects.addBanner(t('bannerRoundComplete', { bonus }));
             this.phase = 'prep';
             if (this.audio) this.audio.playRoundComplete();
             return;
@@ -242,7 +243,7 @@ export class GameState {
             tower.attackAnimTimer = 0;
         }
 
-        this.effects.addBanner(`Round Complete! +${bonus} bonus`);
+        this.effects.addBanner(t('bannerRoundComplete', { bonus }));
 
         if (this.round >= this._roundData.length) {
             this.phase = 'victory_offer';
