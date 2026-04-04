@@ -410,17 +410,17 @@ function renderHowToPlay() {
     }
     drawGarbageBin(ctx, beltX + beltW + 22, beltMidY, tile);
 
-    const t = Date.now() * 0.001;
+    const animT = Date.now() * 0.001;
     const ndSalmon = ENEMY_DATA.find(e => e.id === 'salmon');
     const ndTamago = ENEMY_DATA.find(e => e.id === 'tamago');
     if (ndSalmon) {
-        const slide = Math.sin(t * 1.4) * tile * 2.2;
-        const bob = Math.sin(t * 3 + 1) * 2.5;
+        const slide = Math.sin(animT * 1.4) * tile * 2.2;
+        const bob = Math.sin(animT * 3 + 1) * 2.5;
         drawNigiri(ctx, beltX + tile * 4.5 + slide, beltMidY + bob, 40, ndSalmon, 1);
     }
     if (ndTamago) {
-        const slide = Math.sin(t * 1.1 + 1.7) * tile * 2.4;
-        const bob = Math.sin(t * 3 + 2.5) * 2.5;
+        const slide = Math.sin(animT * 1.1 + 1.7) * tile * 2.4;
+        const bob = Math.sin(animT * 3 + 2.5) * 2.5;
         drawNigiri(ctx, beltX + tile * 6.8 + slide, beltMidY + bob, 38, ndTamago, 1);
     }
 
