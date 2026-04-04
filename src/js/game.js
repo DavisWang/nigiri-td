@@ -41,8 +41,8 @@ export class GameState {
         this.infiniteMode = false;
         this.infiniteRound = 1;
         this.paused = false;
-        /** Index into {@link GAME_SPEED_LEVELS} (default 1 = 1×). */
-        this.speedIndex = 1;
+        /** Index into {@link GAME_SPEED_LEVELS} (default 2 = 1×). */
+        this.speedIndex = 2;
         this.towerGrid = Array.from({ length: GRID_ROWS }, () => Array(GRID_COLS).fill(null));
         this.totalEaten = 0;
         this.totalEarned = 0;

@@ -15,7 +15,7 @@ export const SELL_REFUND_RATE = 0.58;
 export const BASE_BELT_SPEED = 60;
 
 /** Wave-phase speed buttons: `dt` is multiplied by the selected value (default 1×). */
-export const GAME_SPEED_LEVELS = [0.5, 1, 2];
+export const GAME_SPEED_LEVELS = [0.25, 0.5, 1, 2, 4];
 
 export const COLORS = {
     bg: '#FFF8E7',
@@ -349,10 +349,10 @@ export function getInfiniteSpeedMult(k) {
     return Math.min(2, 1 + (k - 1) / span);
 }
 
-/** First infinite round uses 0.5× base kill $; then ×0.85 each round; floor 5%. */
-const INFINITE_MONEY_START_MULT = 0.5;
-const INFINITE_MONEY_MULT_STEP = 0.85;
-const INFINITE_MONEY_MULT_FLOOR = 0.05;
+/** First infinite round uses 0.7× base kill $; then ×0.9 each round; floor 10%. */
+const INFINITE_MONEY_START_MULT = 0.7;
+const INFINITE_MONEY_MULT_STEP = 0.9;
+const INFINITE_MONEY_MULT_FLOOR = 0.1;
 
 export function getInfiniteMoneyMult(k) {
     if (k < 1) return 1;
