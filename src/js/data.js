@@ -339,9 +339,14 @@ export function getInfiniteSpeedMult(k) {
     return Math.min(1.28, 1 + 0.015 * (k - 1));
 }
 
+/** Per infinite round, kill $ is × this (stacked each k). 0.85 = 15% less per round. */
+const INFINITE_MONEY_MULT_STEP = 0.85;
+/** Minimum fraction of base kill $ (before Tanuki). */
+const INFINITE_MONEY_MULT_FLOOR = 0.1;
+
 export function getInfiniteMoneyMult(k) {
     if (k < 1) return 1;
-    return Math.max(0.4, 0.93 ** (k - 1));
+    return Math.max(INFINITE_MONEY_MULT_FLOOR, INFINITE_MONEY_MULT_STEP ** (k - 1));
 }
 
 export function getInfiniteSpawnIntervalMult(k) {

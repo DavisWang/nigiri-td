@@ -509,6 +509,7 @@ function renderSelectedInfo(ctx, game, m) {
     ctx.stroke();
 
     const pad = 8;
+    const textX = x + 50;
     let cy = y + pad;
 
     ctx.save();
@@ -522,7 +523,7 @@ function renderSelectedInfo(ctx, game, m) {
     ctx.font = m.fontSelTitle;
     ctx.textAlign = 'left';
     ctx.textBaseline = 'top';
-    ctx.fillText(tower.typeData.name, x + 50, cy);
+    ctx.fillText(tower.typeData.name, textX, cy);
     {
         const starGap = 14;
         const starOuterR = 5;
@@ -535,16 +536,16 @@ function renderSelectedInfo(ctx, game, m) {
     const buffed = tower.getBuffedStats(game.towers);
     ctx.font = m.fontSelStat;
     ctx.fillStyle = '#555';
-    ctx.fillText(`DMG ${buffed.damage}`, x + pad, cy);
-    ctx.fillText(`RNG ${buffed.range}`, x + pad + 68, cy);
-    ctx.fillText(`SPD ${buffed.speed}ms`, x + pad + 136, cy);
+    ctx.fillText(`DMG ${buffed.damage}`, textX, cy);
+    ctx.fillText(`RNG ${buffed.range}`, textX + 68, cy);
+    ctx.fillText(`SPD ${buffed.speed}ms`, textX + 136, cy);
     cy += 16;
 
     const specialText = formatSpecial(buffed.special);
     if (specialText) {
         ctx.font = m.fontSelSpecial;
         ctx.fillStyle = '#9C27B0';
-        ctx.fillText(specialText, x + pad, cy);
+        ctx.fillText(specialText, textX, cy);
     }
     cy += 14;
 
@@ -556,7 +557,7 @@ function renderSelectedInfo(ctx, game, m) {
         const spdDiff = next.speed - curr.speed;
 
         ctx.font = m.fontSelNext;
-        let dx = x + pad;
+        let dx = textX;
         ctx.fillStyle = '#AAA';
         ctx.fillText('Next:', dx, cy);
         dx += 32;
@@ -582,12 +583,12 @@ function renderSelectedInfo(ctx, game, m) {
         if (nextSpecial && nextSpecial !== currSpecial) {
             ctx.fillStyle = '#9C27B0';
             ctx.font = m.fontSelHint;
-            ctx.fillText(`\u2192 ${nextSpecial}`, x + pad + 32, cy);
+            ctx.fillText(`\u2192 ${nextSpecial}`, textX + 32, cy);
         }
     } else {
         ctx.font = m.fontSelNext;
         ctx.fillStyle = '#999';
-        ctx.fillText('Fully upgraded', x + pad, cy);
+        ctx.fillText('Fully upgraded', textX, cy);
     }
     cy += 16;
 
@@ -622,6 +623,7 @@ function renderPlacingInfo(ctx, game, m) {
     const x = SIDEBAR_X + 12;
     const w = SIDEBAR_WIDTH - 24;
     const pad = 8;
+    const textX = x + 50;
 
     ctx.fillStyle = '#FFFFFF';
     ctx.strokeStyle = COLORS.sidebarBorder;
@@ -642,30 +644,30 @@ function renderPlacingInfo(ctx, game, m) {
     ctx.font = m.fontPlaceTitle;
     ctx.textAlign = 'left';
     ctx.textBaseline = 'top';
-    ctx.fillText(td.name, x + 50, y + pad);
+    ctx.fillText(td.name, textX, y + pad);
 
     ctx.font = m.fontPlaceDesc;
     ctx.fillStyle = '#999';
-    ctx.fillText(td.description, x + 50, y + pad + 16);
+    ctx.fillText(td.description, textX, y + pad + 16);
 
     ctx.font = m.fontPlaceStat;
     ctx.fillStyle = '#555';
-    ctx.fillText(`DMG ${base.damage}`, x + pad, y + pad + 36);
-    ctx.fillText(`RNG ${base.range}`, x + pad + 68, y + pad + 36);
-    ctx.fillText(`SPD ${base.speed}ms`, x + pad + 136, y + pad + 36);
+    ctx.fillText(`DMG ${base.damage}`, textX, y + pad + 36);
+    ctx.fillText(`RNG ${base.range}`, textX + 68, y + pad + 36);
+    ctx.fillText(`SPD ${base.speed}ms`, textX + 136, y + pad + 36);
 
     const specialText = formatSpecial(base.special);
     if (specialText) {
         ctx.font = m.fontPlaceSpecial;
         ctx.fillStyle = '#9C27B0';
-        ctx.fillText(specialText, x + pad, y + pad + 52);
+        ctx.fillText(specialText, textX, y + pad + 52);
     }
 
     if (showNeedFunds) {
         ctx.font = m.fontPlaceNeed;
         ctx.fillStyle = COLORS.textAccent;
         ctx.textAlign = 'left';
-        ctx.fillText(`Need $${base.cost} to place (preview)`, x + pad, y + panelH - 14);
+        ctx.fillText(`Need $${base.cost} to place (preview)`, textX, y + panelH - 14);
     }
 }
 

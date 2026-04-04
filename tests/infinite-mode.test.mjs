@@ -40,8 +40,8 @@ assert(approx(getInfiniteSpeedMult(2), 1.015), 'Speed k=2 is 1.015');
 assert(approx(getInfiniteSpeedMult(999), 1.28), 'Speed caps at 1.28');
 
 assert(approx(getInfiniteMoneyMult(1), 1), 'Money k=1 is 1');
-assert(approx(getInfiniteMoneyMult(2), 0.93), 'Money k=2 is 0.93');
-assert(getInfiniteMoneyMult(200) === 0.4, 'Money floors at 0.4');
+assert(approx(getInfiniteMoneyMult(2), 0.85), 'Money k=2 is 0.85');
+assert(getInfiniteMoneyMult(200) === 0.1, 'Money floors at 0.1');
 
 assert(approx(getInfiniteSpawnIntervalMult(1), 1), 'Spawn k=1 is 1');
 assert(approx(getInfiniteSpawnIntervalMult(2), 0.985), 'Spawn k=2 is 0.985');
