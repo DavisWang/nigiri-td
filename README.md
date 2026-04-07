@@ -49,11 +49,14 @@ Tests are Node-based checks for map paths, belt tile orientation, sidebar layout
 | Path | Purpose |
 | --- | --- |
 | `src/index.html` | Entry page, mobile viewport meta, canvas |
-| `src/js/main.js` | Title, how-to, map & difficulty flow, loop |
-| `src/js/input.js` | Pointer + touch/mouse input |
-| `src/js/game.js` | Rounds, waves, economy, difficulty multipliers, infinite mode |
-| `src/js/data.js` | Maps, towers, enemies, `DIFFICULTY_PROFILES` |
-| `src/js/ui.js` | HUD, shop, overlays, back button |
+| `src/js/main.js` | Title, how-to, map & difficulty flow, game loop, keyboard shortcuts |
+| `src/js/input.js` | Pointer + touch/mouse input, key / code tracking |
+| `src/js/game.js` | Rounds, waves, economy, kill payouts, difficulty multipliers, infinite mode |
+| `src/js/data.js` | Maps, towers, enemies, `DIFFICULTY_PROFILES`, `GAME_SPEED_LEVELS` |
+| `src/js/entities.js` | `Enemy`, `Tower` (attacks, targeting, damage) |
+| `src/js/ui.js` | HUD, shop, sidebar panels, overlays, back button |
+| `src/js/effects.js` | Floating text, particles, round banners |
+| `src/js/i18n.js` | EN / 简体中文 strings, locale toggle persistence |
 | `src/js/sprites.js` | Canvas drawing |
 | `src/js/audio.js` | Web Audio SFX and BGM |
 | `docs/PLAYING.md` | Controls, difficulty, mobile behavior |

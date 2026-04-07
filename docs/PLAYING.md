@@ -8,6 +8,7 @@ Conveyor sushi heads toward the trash. You place **animals** on buildable seats 
 
 **Title** → **Map** → **Difficulty** (Easy / Intermediate / Hard) → **Gameplay** → after round 10, **victory offer** (infinite or end run) → title or retry on game over / victory.
 
+- **Language:** top-right on the title screen toggles **English** / **简体中文** (saved in `localStorage`).
 - **How to Play** on the title is optional flavor text plus a tiny belt vignette.
 - **Test Mode** (title) is the same as a normal run (all 10 rounds per map, infinite mode, difficulty) except **unlimited money** for placing and upgrading.
 - **Crossroads** map includes extra starting money (see `startingMoneyBonus` in `data.js`).
@@ -16,8 +17,16 @@ Conveyor sushi heads toward the trash. You place **animals** on buildable seats 
 
 ### Mouse / trackpad (desktop)
 
-- **Click** — menus, map cards, difficulty, shop, grid, **Start Wave**, overlays, mute, round **back** (top-left in map/difficulty/play).
-- **Keyboard** (optional): **Space** start wave (not on the post–round-10 offer screen), **Esc** deselect / back on menus, **U** / **S** upgrade / sell selected tower, **M** mute, **1–4** map quick-pick, **1–3** difficulty quick-pick.
+- **Click** — menus, map cards, difficulty, shop, grid, **Start Wave**, wave **Slower / Pause / Faster**, overlays, mute, round **back** (top-left in map/difficulty/play). With a tower selected: **Targeting** (**Weakest first** / **Furthest first**), **Upgrade**, **Sell**.
+- **Keyboard** (gameplay, when not paused on blocking overlays):
+  - **Space** — start wave (prep only; not on the post–round-10 offer screen).
+  - **P** — pause / resume.
+  - **Esc** — cancel place mode, then clear tower selection (or resume from pause).
+  - **U** / **S** — upgrade / sell selected tower.
+  - **M** — mute.
+  - **+** / **=** or numpad **+** — faster game speed during an active wave; **−** or numpad **−** — slower (same steps as the sidebar buttons).
+  - **1–9**, **0** — select tower for placement (shop order: **1** Cat … **0** Dragon); press again to cancel. Not used on map/difficulty screens (those use **1–4** / **1–3** there).
+- **Map / difficulty screens:** **1–4** quick-pick map, **1–3** difficulty, **Esc** back.
 
 ### Touch (iPhone / iPad)
 
@@ -36,6 +45,31 @@ Conveyor sushi heads toward the trash. You place **animals** on buildable seats 
 | Hard           | **+25%** HP and **10%** faster spawns (shorter interval). |
 
 Global tower and enemy definitions in `ENEMY_DATA` / `TOWER_DATA` are unchanged; only multipliers for that run apply.
+
+## Tower targeting (per tower)
+
+When a tower is selected, **Targeting** chooses how it picks enemies **in range** for attacks (including multi-hit and pierce order):
+
+| Mode | Priority |
+| --- | --- |
+| **Weakest first** | Lowest **current HP**, then furthest along the belt as a tie-break. |
+| **Furthest first** | Furthest along the belt toward the trash (**default**, matches legacy behavior), then lowest HP as a tie-break. |
+
+## Tanuki kill gold
+
+**Tanuki** adds a percentage to kill gold when its bonus applies (tiers **+30% / +45% / +60%** in `TOWER_DATA`). Credit uses **last hit by Tanuki** when that tower got the killing blow; **otherwise** the **closest tower** (Euclidean distance to the sushi when it dies) sets the bonus—so a nearby Tanuki can still apply the bonus without last hit. The floating **+total (+extra …)** text shows when extra gold was added.
+
+## Lives lost when sushi escapes
+
+Each type has a `lifePenalty` in `src/js/data.js` (hearts removed when it reaches the bin):
+
+| Lives | Types |
+| ---: | --- |
+| 1 | Tamago, Salmon |
+| 2 | Squid, Shrimp, Tuna |
+| 3 | Mackerel, Hotate |
+| 4 | Ikura, Uni |
+| 5 | Wagyu |
 
 ## Infinite mode (after round 10)
 

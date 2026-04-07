@@ -14,6 +14,7 @@ import {
 import {
     uiFont, t, formatSpecialLocalized, mapName, difficultyLabel, towerName, towerDesc,
 } from './i18n.js';
+import { TARGET_MODE_WEAKEST, TARGET_MODE_FURTHEST } from './entities.js';
 
 /** Larger type + tap targets on portrait phones (width-limited scale). Landscape/tablet use `compact === false`. */
 function getSidebarMetrics(compact) {
@@ -26,7 +27,7 @@ function getSidebarMetrics(compact) {
             waveRowY: 110,
             startBtnY: 128,
             startBtnH: 32,
-            shopStartY: 196,
+            shopStartY: 188,
             shopCols: 2,
             shopItemW: 145,
             shopItemH: 46,
@@ -47,7 +48,7 @@ function getSidebarMetrics(compact) {
             fontTowerName: `bold 12px 'Arial Rounded MT Bold', sans-serif`,
             fontTowerCost: `bold 11px sans-serif`,
             towerIconR: 38,
-            panelSelectedH: 160,
+            panelSelectedH: 196,
             panelPlacingHNeed: 96,
             panelPlacingHOk: 82,
             fontSelTitle: `bold 14px 'Arial Rounded MT Bold', sans-serif`,
@@ -75,7 +76,7 @@ function getSidebarMetrics(compact) {
         waveRowY: 102,
         startBtnY: 122,
         startBtnH: 40,
-        shopStartY: 178,
+        shopStartY: 150,
         shopCols,
         shopItemW,
         shopItemH: 52,
@@ -96,7 +97,7 @@ function getSidebarMetrics(compact) {
         fontTowerName: `bold 14px 'Arial Rounded MT Bold', sans-serif`,
         fontTowerCost: `bold 12px sans-serif`,
         towerIconR: 42,
-        panelSelectedH: 176,
+        panelSelectedH: 204,
         panelPlacingHNeed: 108,
         panelPlacingHOk: 92,
         fontSelTitle: `bold 15px 'Arial Rounded MT Bold', sans-serif`,
@@ -465,6 +466,8 @@ function renderTowerShop(ctx, game, input, m) {
 }
 
 function renderSelectedInfo(ctx, game, m) {
+    game._targetWeakestBtn = null;
+    game._targetFurthestBtn = null;
     if (!game.selectedTower) return;
     const tower = game.selectedTower;
     const x = SIDEBAR_X + 12;
@@ -565,6 +568,22 @@ function renderSelectedInfo(ctx, game, m) {
         ctx.fillText(t('fullyUpgraded'), textX, cy);
     }
     cy += 16;
+
+    ctx.font = uiFont(m.fontSelHint);
+    ctx.fillStyle = '#888';
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'top';
+    ctx.fillText(t('targetingLabel'), textX, cy);
+    cy += 14;
+    const tGap = 6;
+    const tBtnW = (w - 8 - tGap) / 2;
+    const targetBtnH = Math.max(24, m.btnRowH - 4);
+    const tm = tower.targetMode === TARGET_MODE_WEAKEST ? TARGET_MODE_WEAKEST : TARGET_MODE_FURTHEST;
+    game._targetWeakestBtn = drawButton(ctx, x + 4, cy, tBtnW, targetBtnH, t('targetWeakest'),
+        tm === TARGET_MODE_WEAKEST ? '#3498DB' : '#95A5A6', true);
+    game._targetFurthestBtn = drawButton(ctx, x + 4 + tBtnW + tGap, cy, tBtnW, targetBtnH, t('targetFurthest'),
+        tm === TARGET_MODE_FURTHEST ? '#3498DB' : '#95A5A6', true);
+    cy += targetBtnH + 8;
 
     const btnW = (w - 10) / 2;
     if (tower.canUpgrade()) {
@@ -829,6 +848,19 @@ export function handleGameClick(game, clickX, clickY, input, vp) {
             game.sellTower(game.selectedTower);
             return;
         }
+    }
+
+    if (game.selectedTower && game._targetWeakestBtn &&
+        hitTest(clickX, clickY, game._targetWeakestBtn)) {
+        if (game.audio) game.audio.playClick();
+        game.selectedTower.targetMode = TARGET_MODE_WEAKEST;
+        return;
+    }
+    if (game.selectedTower && game._targetFurthestBtn &&
+        hitTest(clickX, clickY, game._targetFurthestBtn)) {
+        if (game.audio) game.audio.playClick();
+        game.selectedTower.targetMode = TARGET_MODE_FURTHEST;
+        return;
     }
 
     for (let i = 0; i < TOWER_DATA.length; i++) {

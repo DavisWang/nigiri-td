@@ -8,6 +8,8 @@ export class InputManager {
         this.clickY = 0;
         this.keysPressed = new Set();
         this.keysJustPressed = new Set();
+        this.codesPressed = new Set();
+        this.codesJustPressed = new Set();
 
         const rectScale = () => {
             const rect = canvas.getBoundingClientRect();
@@ -104,10 +106,15 @@ export class InputManager {
                 this.keysJustPressed.add(e.key);
             }
             this.keysPressed.add(e.key);
+            if (!this.codesPressed.has(e.code)) {
+                this.codesJustPressed.add(e.code);
+            }
+            this.codesPressed.add(e.code);
         });
 
         window.addEventListener('keyup', (e) => {
             this.keysPressed.delete(e.key);
+            this.codesPressed.delete(e.code);
         });
 
         canvas.addEventListener('contextmenu', (e) => e.preventDefault());
@@ -125,8 +132,14 @@ export class InputManager {
         return this.keysJustPressed.has(key);
     }
 
+    /** Physical key, e.g. `NumpadAdd` / `NumpadSubtract` (stable across layouts). */
+    wasCodePressed(code) {
+        return this.codesJustPressed.has(code);
+    }
+
     endFrame() {
         this.clicked = false;
         this.keysJustPressed.clear();
+        this.codesJustPressed.clear();
     }
 }

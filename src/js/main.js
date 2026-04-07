@@ -1,6 +1,6 @@
 import {
     CANVAS_WIDTH, CANVAS_HEIGHT, COLORS, ENEMY_DATA, MAP_DEFINITIONS, GRID_COLS, GRID_ROWS, MapContext,
-    DIFFICULTY_ORDER, DIFFICULTY_PROFILES, getMapById,
+    DIFFICULTY_ORDER, DIFFICULTY_PROFILES, getMapById, GAME_SPEED_LEVELS, TOWER_DATA,
 } from './data.js';
 import {
     t, uiFont, mapName, difficultyLabel, difficultyHint,
@@ -19,6 +19,9 @@ import {
     drawHeart, drawCoin, drawKitchenDoor, drawGarbageBin,
 } from './sprites.js';
 import { loadAllSprites } from './sprite-loader.js';
+
+/** Shop place-mode: 1–9 = towers 1–9, 0 = 10th (Dragon); matches `TOWER_DATA` order. */
+const SHOP_PLACE_KEYS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'];
 
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
@@ -357,6 +360,44 @@ function update(dt) {
             audio._ensureContext();
             audio.toggle();
             startBgmIfUnmuted();
+        }
+
+        const canShopHotkeys = !game.paused && !game.gameOver && !game.victory &&
+            game.phase !== 'victory_offer';
+        if (canShopHotkeys) {
+            const n = Math.min(SHOP_PLACE_KEYS.length, TOWER_DATA.length);
+            for (let i = 0; i < n; i++) {
+                if (input.wasKeyPressed(SHOP_PLACE_KEYS[i])) {
+                    audio._ensureContext();
+                    audio.playClick();
+                    const td = TOWER_DATA[i];
+                    if (game.placingTowerId === td.id) {
+                        game.placingTowerId = null;
+                    } else {
+                        game.placingTowerId = td.id;
+                        game.selectedTower = null;
+                    }
+                    break;
+                }
+            }
+        }
+
+        const canKeyWaveSpeed =
+            game.phase === 'wave' && !game.gameOver && !game.victory;
+        if (canKeyWaveSpeed) {
+            const fasterKey = input.wasKeyPressed('+') || input.wasKeyPressed('=') ||
+                input.wasCodePressed('NumpadAdd');
+            const slowerKey = input.wasKeyPressed('-') || input.wasCodePressed('NumpadSubtract');
+            if (fasterKey && game.speedIndex < GAME_SPEED_LEVELS.length - 1) {
+                audio._ensureContext();
+                game.speedIndex++;
+                audio.playClick();
+            }
+            if (slowerKey && game.speedIndex > 0) {
+                audio._ensureContext();
+                game.speedIndex--;
+                audio.playClick();
+            }
         }
     }
 }

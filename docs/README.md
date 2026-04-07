@@ -4,7 +4,7 @@
 
 | Document | Contents |
 | --- | --- |
-| [PLAYING.md](PLAYING.md) | Screens, **desktop + touch** controls, difficulty, **infinite mode**, audio, mobile notes |
+| [PLAYING.md](PLAYING.md) | Screens, **desktop + touch** controls, **i18n**, targeting, Tanuki / leak rules, difficulty, **infinite mode**, audio, mobile notes |
 
 ## Design & planning (`project/`)
 

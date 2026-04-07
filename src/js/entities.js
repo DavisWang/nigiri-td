@@ -4,6 +4,10 @@ import {
     cellToPixel, getTotalCost, getSellValue, getUpgradeCost,
 } from './data.js';
 
+/** Per-tower target priority for `_findTargets`. */
+export const TARGET_MODE_FURTHEST = 'furthest';
+export const TARGET_MODE_WEAKEST = 'weakest';
+
 export class Enemy {
     constructor(typeId, mapPath, hpMult = 1, speedMult = 1, moneyMult = 1) {
         const data = ENEMY_DATA.find(e => e.id === typeId);
@@ -24,6 +28,8 @@ export class Enemy {
         this.stunTimer = 0;
         this.burnTimer = 0;
         this.burnDps = 0;
+        /** Last tower that dealt direct damage (for Tanuki last-hit bonus priority). */
+        this.lastHitTower = null;
         this.x = 0;
         this.y = 0;
         this._updatePosition();
@@ -85,7 +91,11 @@ export class Enemy {
         this._updatePosition();
     }
 
-    takeDamage(amount) {
+    /**
+     * @param {Tower | null} [attackerTower]
+     */
+    takeDamage(amount, attackerTower = null) {
+        if (attackerTower) this.lastHitTower = attackerTower;
         this.hp -= amount;
         if (this.hp <= 0) {
             this.hp = 0;
@@ -104,7 +114,9 @@ export class Enemy {
         this.stunTimer = Math.max(this.stunTimer, duration);
     }
 
-    applyBurn(dps, duration) {
+    /** @param {Tower | null} [attackerTower] burn kill credits this tower */
+    applyBurn(dps, duration, attackerTower = null) {
+        if (attackerTower) this.lastHitTower = attackerTower;
         this.burnDps = dps;
         this.burnTimer = duration;
     }
@@ -127,6 +139,8 @@ export class Tower {
         const pos = cellToPixel(col, row);
         this.x = pos.x;
         this.y = pos.y;
+        /** `'weakest'` = lowest current HP first; `'furthest'` = highest path `distance` (nearest bin) first. */
+        this.targetMode = TARGET_MODE_FURTHEST;
     }
 
     get stats() { return this.typeData.tiers[this.tier]; }
@@ -194,7 +208,7 @@ export class Tower {
                         dmg *= 2;
                     }
 
-                    target.takeDamage(dmg);
+                    target.takeDamage(dmg, this);
                     effects.addFloatingText(target.x, target.y - 15, `-${dmg}`, '#FFFFFF');
 
                     if (sp) {
@@ -202,7 +216,7 @@ export class Tower {
                         if (sp.type === 'stun' && Math.random() < sp.chance) target.applyStun(sp.dur);
                         if (sp.type === 'aoe' && sp.burn && !target.alive) {
                         } else if (sp.type === 'aoe' && sp.burn) {
-                            target.applyBurn(sp.burn.dps, sp.burn.dur);
+                            target.applyBurn(sp.burn.dps, sp.burn.dur, this);
                         }
                     }
 
@@ -211,9 +225,9 @@ export class Tower {
                             if (e === target || !e.alive || e.exited) continue;
                             const d = Math.hypot(e.x - target.x, e.y - target.y) / CELL_SIZE;
                             if (d <= sp.radius) {
-                                e.takeDamage(dmg);
+                                e.takeDamage(dmg, this);
                                 effects.addFloatingText(e.x, e.y - 15, `-${dmg}`, '#FF9800');
-                                if (sp.burn) e.applyBurn(sp.burn.dps, sp.burn.dur);
+                                if (sp.burn) e.applyBurn(sp.burn.dps, sp.burn.dur, this);
                             }
                         }
                     }
@@ -223,7 +237,7 @@ export class Tower {
                             if (e === target || !e.alive || e.exited) continue;
                             const d = Math.hypot(e.x - target.x, e.y - target.y) / CELL_SIZE;
                             if (d <= sp.splash) {
-                                e.takeDamage(Math.round(dmg * 0.5));
+                                e.takeDamage(Math.round(dmg * 0.5), this);
                             }
                         }
                     }
@@ -244,8 +258,13 @@ export class Tower {
 
         const inRange = enemies
             .filter(e => e.alive && !e.exited)
-            .filter(e => Math.hypot(e.x - this.x, e.y - this.y) <= rangePx)
-            .sort((a, b) => b.distance - a.distance);
+            .filter(e => Math.hypot(e.x - this.x, e.y - this.y) <= rangePx);
+
+        if (this.targetMode === TARGET_MODE_WEAKEST) {
+            inRange.sort((a, b) => (a.hp - b.hp) || (b.distance - a.distance));
+        } else {
+            inRange.sort((a, b) => (b.distance - a.distance) || (a.hp - b.hp));
+        }
 
         return inRange.slice(0, maxTargets);
     }

@@ -47,7 +47,7 @@ export const TIER_COLORS = {
 
 export const TOWER_DATA = [
     { id: 'cat', name: 'Cat', emoji: '🐱', description: 'Quick and cheap. Great early-game pick.', primary: '#F5A623', accent: '#FFF3E0', eyeColor: '#4CAF50', tiers: [{ cost: 50, damage: 5, range: 1.5, speed: 500, special: null },{ cost: 50, damage: 7, range: 1.5, speed: 440, special: null },{ cost: 75, damage: 11, range: 2.0, speed: 385, special: { type: 'doubleBite', chance: 0.15 } }] },
-    { id: 'tanuki', name: 'Tanuki', emoji: '🦝', description: 'Earns bonus money from every kill.', primary: '#8D6E63', accent: '#D7CCC8', eyeColor: '#4E342E', tiers: [{ cost: 75, damage: 7, range: 2.0, speed: 800, special: { type: 'bonusMoney', mult: 0.25 } },{ cost: 75, damage: 9, range: 2.0, speed: 770, special: { type: 'bonusMoney', mult: 0.36 } },{ cost: 100, damage: 13, range: 2.5, speed: 660, special: { type: 'bonusMoney', mult: 0.54 } }] },
+    { id: 'tanuki', name: 'Tanuki', emoji: '🦝', description: 'Earns bonus money from every kill.', primary: '#8D6E63', accent: '#D7CCC8', eyeColor: '#4E342E', tiers: [{ cost: 75, damage: 7, range: 2.0, speed: 800, special: { type: 'bonusMoney', mult: 0.30 } },{ cost: 75, damage: 9, range: 2.0, speed: 770, special: { type: 'bonusMoney', mult: 0.45 } },{ cost: 100, damage: 13, range: 2.5, speed: 660, special: { type: 'bonusMoney', mult: 0.60 } }] },
     { id: 'penguin', name: 'Penguin', emoji: '🐧', description: 'Slows enemies with each icy attack.', primary: '#1A237E', accent: '#FFFFFF', eyeColor: '#212121', tiers: [{ cost: 80, damage: 3, range: 2.0, speed: 700, special: { type: 'slow', pct: 0.25, dur: 1000 } },{ cost: 80, damage: 5, range: 2.5, speed: 660, special: { type: 'slow', pct: 0.32, dur: 1500 } },{ cost: 100, damage: 7, range: 3.0, speed: 550, special: { type: 'slow', pct: 0.45, dur: 2000 } }] },
     { id: 'fox', name: 'Fox', emoji: '🦊', description: 'Long-range precision. Pierces at tier 3.', primary: '#E64A19', accent: '#FFF8E1', eyeColor: '#FF8F00', tiers: [{ cost: 100, damage: 10, range: 2.5, speed: 900, special: null },{ cost: 100, damage: 14, range: 3.0, speed: 880, special: null },{ cost: 125, damage: 20, range: 3.5, speed: 770, special: { type: 'pierce', count: 2 } }] },
     { id: 'monkey', name: 'Monkey', emoji: '🐒', description: 'Ranged hurler. Gains slow at tier 3.', primary: '#A1887F', accent: '#FFCCBC', eyeColor: '#5D4037', tiers: [{ cost: 100, damage: 12, range: 3.0, speed: 1000, special: null },{ cost: 100, damage: 16, range: 3.0, speed: 935, special: null },{ cost: 125, damage: 23, range: 3.5, speed: 770, special: { type: 'slow', pct: 0.27, dur: 1000 } }] },
@@ -66,9 +66,9 @@ export const ENEMY_DATA = [
     { id: 'tuna', name: 'Tuna', hp: 94, speed: 1.0, money: 13, lifePenalty: 2, tier: 'Standard', color: '#EF5350' },
     { id: 'mackerel', name: 'Mackerel', hp: 121, speed: 1.2, money: 16, lifePenalty: 3, tier: 'Premium', color: '#90A4AE' },
     { id: 'scallop', name: 'Hotate', hp: 154, speed: 1.0, money: 19, lifePenalty: 3, tier: 'Premium', color: '#FFF9C4' },
-    { id: 'ikura', name: 'Ikura', hp: 228, speed: 1.3, money: 24, lifePenalty: 5, tier: 'Deluxe', color: '#FF7043' },
-    { id: 'uni', name: 'Uni', hp: 304, speed: 1.1, money: 30, lifePenalty: 5, tier: 'Deluxe', color: '#FFB300' },
-    { id: 'wagyu', name: 'Wagyu', hp: 443, speed: 1.0, money: 42, lifePenalty: 6, tier: 'Boss', color: '#EF5350' },
+    { id: 'ikura', name: 'Ikura', hp: 228, speed: 1.3, money: 24, lifePenalty: 4, tier: 'Deluxe', color: '#FF7043' },
+    { id: 'uni', name: 'Uni', hp: 304, speed: 1.1, money: 30, lifePenalty: 4, tier: 'Deluxe', color: '#FFB300' },
+    { id: 'wagyu', name: 'Wagyu', hp: 443, speed: 1.0, money: 42, lifePenalty: 5, tier: 'Boss', color: '#EF5350' },
 ];
 
 /**

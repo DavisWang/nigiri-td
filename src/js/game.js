@@ -165,20 +165,24 @@ export class GameState {
         const toRemove = [];
         for (const enemy of this.enemies) {
             if (!enemy.alive && !enemy.exited) {
-                let reward = enemy.money;
-                const killer = this._findKiller(enemy);
-                if (killer) {
-                    const sp = killer.stats.special;
-                    if (sp && sp.type === 'bonusMoney') {
-                        reward = Math.round(reward * (1 + sp.mult));
-                    }
+                const baseMoney = enemy.money;
+                const killer = this._towerForBonusMoney(enemy);
+                const mult = this._bonusMoneyMult(killer);
+                let reward = baseMoney;
+                if (mult > 0) {
+                    reward = Math.round(baseMoney * (1 + mult));
+                    if (reward <= baseMoney) reward = baseMoney + 1;
                 }
+                const extraGold = reward - baseMoney;
                 this.money += reward;
                 this.totalEarned += reward;
                 this.roundEarned += reward;
                 this.totalEaten++;
                 this.roundEaten++;
-                this.effects.addFloatingText(enemy.x, enemy.y - 20, `+${reward}`, '#F1C40F');
+                const goldLabel = extraGold > 0
+                    ? t('killGoldWithBonus', { total: reward, extra: extraGold })
+                    : `+${reward}`;
+                this.effects.addFloatingText(enemy.x, enemy.y - 22, goldLabel, '#F1C40F', extraGold > 0 ? 15 : 14);
                 this.effects.addBurst(enemy.x, enemy.y, enemy.data.color);
                 if (this.audio) this.audio.playPop();
                 toRemove.push(enemy);
@@ -204,6 +208,23 @@ export class GameState {
         if (this.spawner && this.spawner.done && this.enemies.length === 0) {
             this._endRound();
         }
+    }
+
+    /** @param {import('./entities.js').Tower | null | undefined} tower */
+    _bonusMoneyMult(tower) {
+        if (!tower?.typeData?.tiers) return 0;
+        const sp = tower.typeData.tiers[tower.tier]?.special;
+        return (sp?.type === 'bonusMoney' && typeof sp.mult === 'number') ? sp.mult : 0;
+    }
+
+    /**
+     * Tanuki: if it got the killing blow, always credit its bonus (even if another tower is closer).
+     * Otherwise keep Euclidean-closest tower for bonus % (lenient proximity fallback).
+     */
+    _towerForBonusMoney(enemy) {
+        const last = enemy.lastHitTower;
+        if (last?.id === 'tanuki') return last;
+        return this._findKiller(enemy);
     }
 
     _findKiller(enemy) {

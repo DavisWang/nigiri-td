@@ -15,7 +15,7 @@
 | `SELL_REFUND_RATE` | 0.58 |
 | `getRoundBonus(n)` | `30 + n * 7` (n = round just finished, 1–10) |
 | `BASE_BELT_SPEED` | 60 |
-| Enemies | Standard+ buffed HP; reduced kill `money`; ikura/uni/wagyu `lifePenalty` 5/5/6 |
+| Enemies | Standard+ buffed HP; reduced kill `money`; ikura/uni/wagyu `lifePenalty` 4/4/5 |
 | Maps | Tighter `spawnInterval` + selective wave `count` bumps (per pass 1) |
 
 ---

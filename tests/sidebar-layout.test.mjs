@@ -15,14 +15,14 @@ const SHOP_COLS = 2;
 const SHOP_ITEM_W = 145;
 const SHOP_ITEM_H = 46;
 const SHOP_GAP = 4;
-const SHOP_START_Y = 176;
+const SHOP_START_Y = 188;
 const TOWER_COUNT = 10;
 
 const SHOP_ICON_X_OFFSET = 34;
 const SHOP_ICON_SIZE = 38;
 const MAX_TOWER_ASPECT = 1.4;
 
-const SELECTED_PANEL_H = 160;
+const SELECTED_PANEL_H = 196;
 const PLACING_PANEL_H = 82;
 const PANEL_BOTTOM_PAD = 6;
 
