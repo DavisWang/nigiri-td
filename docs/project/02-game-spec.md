@@ -144,26 +144,26 @@ Crowd control. Slows nigiri passing through range.
 | Special | 25% slow 1s | 35% slow 1.5s | 50% slow 2s |
 
 #### 4. Fox (Kitsune)
-Precision striker. High single-target damage at range.
+Precision striker. High damage at range. Tier 2–3 use the same **multi-target** rules as Octopus (UI: “Hits *n* targets”): each attack damages up to *n* enemies in range, chosen by the tower’s targeting mode.
 
 | Stat | Tier 1 | Tier 2 (+100) | Tier 3 (+125) |
 | --- | --- | --- | --- |
 | Cost (total) | 100 | 200 | 325 |
-| Damage | 10 | 16 | 22 |
+| Damage | 10 | 14 | 20 |
 | Range | 2.5 | 3.0 | 3.5 |
-| Speed (ms) | 900 | 800 | 700 |
-| Special | — | — | Piercing (hits 2) |
+| Speed (ms) | 900 | 880 | 770 |
+| Special | — | Hits 2 targets | Hits 3 targets |
 
 #### 5. Monkey (Saru)
-Ranged attacker. Throws food at nigiri from a distance.
+Ranged attacker. Throws food at nigiri from a distance; light slow at tier 2, stronger at tier 3.
 
 | Stat | Tier 1 | Tier 2 (+100) | Tier 3 (+125) |
 | --- | --- | --- | --- |
 | Cost (total) | 100 | 200 | 325 |
-| Damage | 12 | 18 | 26 |
+| Damage | 12 | 16 | 23 |
 | Range | 3.0 | 3.0 | 3.5 |
-| Speed (ms) | 1000 | 850 | 700 |
-| Special | — | — | 20% banana slow (30% for 1s) |
+| Speed (ms) | 1000 | 935 | 770 |
+| Special | — | 14% slow 0.9s | 27% slow 1s |
 
 #### 6. Owl (Fukurou)
 Sniper. Longest base range of any tower.

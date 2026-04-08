@@ -23,3 +23,8 @@ When adding maps or resizing map cards, re-check **width** (≤ `CANVAS_WIDTH`) 
 
 - **Manhattan** range: T1 cap **1**, T2/T3 cap **2** (`shibaAuraManhattanLimit`). Logic lives in `entities.js` with `pickBestShibaAuraSource` (no multi-Shiba stacking on one tower).
 - **Guard:** Run `tests/shiba-aura.test.mjs`. Tie-break tests need Shibas actually **in range** of the recipient (T1 cannot reach Manhattan 2).
+
+## Fox multi-target vs old `pierce`
+
+- **Rule:** Fox tier 2+ uses `special.type === 'multiTarget'` (same code path as Octopus). The **`pierce`** type was removed from the engine.
+- **Guard:** Run `tests/fox-monkey-t2.test.mjs` (included in `npm test`).

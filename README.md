@@ -42,7 +42,7 @@ npm install
 npm test
 ```
 
-Tests are Node-based checks for map paths, belt tile orientation, sidebar layout, Shiba aura (Manhattan + single-source buff), round ladder, **infinite-mode** scalers / wave template, and **test mode** (same rounds / victory offer as a normal run, unlimited money only — no browser required).
+Tests are Node-based checks for map paths, belt tile orientation, sidebar layout, Shiba aura (Manhattan + single-source buff), Fox/Monkey tier-2+ `TOWER_DATA` (multi-target / slow, no legacy `pierce`), round ladder, **infinite-mode** scalers / wave template, and **test mode** (same rounds / victory offer as a normal run, unlimited money only — no browser required).
 
 ## Project layout
 

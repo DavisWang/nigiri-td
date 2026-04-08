@@ -48,12 +48,17 @@ Global tower and enemy definitions in `ENEMY_DATA` / `TOWER_DATA` are unchanged;
 
 ## Tower targeting (per tower)
 
-When a tower is selected, **Targeting** chooses how it picks enemies **in range** for attacks (including multi-hit and pierce order):
+When a tower is selected, **Targeting** chooses how it picks enemies **in range** for attacks (including multi-target order, same as Fox tier 2+ and Octopus):
 
 | Mode | Priority |
 | --- | --- |
 | **Weakest first** | Lowest **current HP**, then furthest along the belt as a tie-break. |
 | **Furthest first** | Furthest along the belt toward the trash (**default**, matches legacy behavior), then lowest HP as a tie-break. |
+
+## Fox and Monkey (tier 2+)
+
+- **Fox:** From tier 2, each attack uses the same **multi-target** rules as **Octopus** (special panel: **“Hits *n* targets”**). Tier 2 hits up to **2** enemies in range per shot; tier 3 up to **3**. There is no separate “pierce” mechanic—just priority order above.
+- **Monkey:** Tier 2 adds a **light slow** on hit; tier 3 uses a **stronger** slow. Values are in `TOWER_DATA` / the in-game stats panel.
 
 ## Shiba Inu (aura)
 

@@ -294,8 +294,7 @@ export class Tower {
     _findTargets(enemies, buffed) {
         const rangePx = buffed.range * CELL_SIZE;
         const sp = buffed.special;
-        const maxTargets = (sp && sp.type === 'multiTarget') ? sp.count :
-            (sp && sp.type === 'pierce') ? sp.count : 1;
+        const maxTargets = (sp && sp.type === 'multiTarget') ? sp.count : 1;
 
         const inRange = enemies
             .filter(e => e.alive && !e.exited)

@@ -136,7 +136,6 @@ const STR = {
         specDoubleBite: '{pct}% double-bite',
         specBonusMoney: '+{mult}% kill money',
         specSlow: '{pct}% slow {dur}s',
-        specPierce: 'Pierce ×{count}',
         specCrit: '{pct}% crit (×{mult} dmg)',
         specMulti: 'Hits {count} targets',
         specMultiSlow: ' + {pct}% slow',
@@ -222,7 +221,6 @@ const STR = {
         specDoubleBite: '{pct}% 二连击',
         specBonusMoney: '击杀金币 +{mult}%',
         specSlow: '{pct}% 减速 {dur} 秒',
-        specPierce: '穿透 ×{count}',
         specCrit: '{pct}% 暴击（×{mult} 伤害）',
         specMulti: '同时命中 {count} 个目标',
         specMultiSlow: ' + {pct}% 减速',
@@ -241,8 +239,8 @@ const TOWERS = {
         cat: { name: 'Cat', desc: 'Quick and cheap. Great early-game pick.' },
         tanuki: { name: 'Tanuki', desc: 'Earns bonus money from every kill.' },
         penguin: { name: 'Penguin', desc: 'Slows enemies with each icy attack.' },
-        fox: { name: 'Fox', desc: 'Long-range precision. Pierces at tier 3.' },
-        monkey: { name: 'Monkey', desc: 'Ranged hurler. Gains slow at tier 3.' },
+        fox: { name: 'Fox', desc: 'Long-range precision. Multiple targets per shot at tier 2–3.' },
+        monkey: { name: 'Monkey', desc: 'Ranged hurler. Light slow at tier 2; stronger at tier 3.' },
         owl: { name: 'Owl', desc: 'Extreme range. Gains crits at tier 3.' },
         octopus: { name: 'Octopus', desc: 'Hits multiple targets simultaneously.' },
         shiba: { name: 'Shiba Inu', desc: 'Buffs nearby towers’ attack speed; tier 2+ reaches Manhattan distance 2.' },
@@ -253,8 +251,8 @@ const TOWERS = {
         cat: { name: '猫', desc: '攻速快、花费低，开局好选择。' },
         tanuki: { name: '狸猫', desc: '每次击杀额外获得金币。' },
         penguin: { name: '企鹅', desc: '冰霜攻击附带减速。' },
-        fox: { name: '狐狸', desc: '远程精准，三级获得穿透。' },
-        monkey: { name: '猴子', desc: '远程投掷，三级附带减速。' },
+        fox: { name: '狐狸', desc: '远程精准，二至三级每次攻击可命中多个目标。' },
+        monkey: { name: '猴子', desc: '远程投掷，二级轻减速，三级更强。' },
         owl: { name: '猫头鹰', desc: '极远射程，三级获得暴击。' },
         octopus: { name: '章鱼', desc: '同时攻击多个目标。' },
         shiba: { name: '柴犬', desc: '提升附近塔的攻速；二级起曼哈顿距离两格。' },
@@ -389,8 +387,6 @@ export function formatSpecialLocalized(special) {
             return t('specBonusMoney', { mult: pct(special.mult) });
         case 'slow':
             return t('specSlow', { pct: pct(special.pct), dur: special.dur / 1000 });
-        case 'pierce':
-            return t('specPierce', { count: special.count });
         case 'crit':
             return t('specCrit', { pct: pct(special.chance), mult: special.mult });
         case 'multiTarget': {
