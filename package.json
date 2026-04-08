@@ -7,7 +7,7 @@
     "doc": "docs"
   },
   "scripts": {
-    "test": "node tests/enemy-path.test.mjs && node tests/belt-orientation.test.mjs && node tests/belt-flow-dir.test.mjs && node tests/sidebar-layout.test.mjs && node tests/map-select-layout.test.mjs && node tests/round-hp-step.test.mjs && node tests/infinite-mode.test.mjs && node tests/test-mode.test.mjs",
+    "test": "node tests/enemy-path.test.mjs && node tests/belt-orientation.test.mjs && node tests/belt-flow-dir.test.mjs && node tests/sidebar-layout.test.mjs && node tests/map-select-layout.test.mjs && node tests/shiba-aura.test.mjs && node tests/round-hp-step.test.mjs && node tests/infinite-mode.test.mjs && node tests/test-mode.test.mjs",
     "serve": "npx --yes serve@14 src -l 3002"
   },
   "repository": {

@@ -14,7 +14,11 @@ import {
 import {
     uiFont, t, formatSpecialLocalized, mapName, difficultyLabel, towerName, towerDesc,
 } from './i18n.js';
-import { TARGET_MODE_WEAKEST, TARGET_MODE_FURTHEST } from './entities.js';
+import {
+    TARGET_MODE_WEAKEST,
+    TARGET_MODE_FURTHEST,
+    shibaAuraManhattanLimit,
+} from './entities.js';
 
 /** Larger type + tap targets on portrait phones (width-limited scale). Landscape/tablet use `compact === false`. */
 function getSidebarMetrics(compact) {
@@ -188,11 +192,68 @@ function renderTowers(ctx, game) {
     }
 }
 
+function renderShibaAuraCoverage(ctx, tower) {
+    const L = shibaAuraManhattanLimit(tower.tier);
+    const sc = tower.col;
+    const sr = tower.row;
+
+    for (let row = 0; row < GRID_ROWS; row++) {
+        for (let col = 0; col < GRID_COLS; col++) {
+            const d = Math.abs(col - sc) + Math.abs(row - sr);
+            if (d < 1 || d > L) continue;
+            const gx = GRID_OFFSET_X + col * CELL_SIZE;
+            const gy = GRID_OFFSET_Y + row * CELL_SIZE;
+            ctx.fillStyle = 'rgba(255, 176, 96, 0.22)';
+            ctx.fillRect(gx, gy, CELL_SIZE, CELL_SIZE);
+        }
+    }
+
+    function inAura(c, r) {
+        if (c < 0 || c >= GRID_COLS || r < 0 || r >= GRID_ROWS) return false;
+        const d = Math.abs(c - sc) + Math.abs(r - sr);
+        return d >= 1 && d <= L;
+    }
+
+    ctx.strokeStyle = 'rgba(200, 120, 40, 0.65)';
+    ctx.lineWidth = 2;
+    ctx.setLineDash([5, 4]);
+    ctx.beginPath();
+    for (let row = 0; row < GRID_ROWS; row++) {
+        for (let col = 0; col < GRID_COLS; col++) {
+            if (!inAura(col, row)) continue;
+            const gx = GRID_OFFSET_X + col * CELL_SIZE;
+            const gy = GRID_OFFSET_Y + row * CELL_SIZE;
+            if (!inAura(col - 1, row)) {
+                ctx.moveTo(gx, gy);
+                ctx.lineTo(gx, gy + CELL_SIZE);
+            }
+            if (!inAura(col + 1, row)) {
+                ctx.moveTo(gx + CELL_SIZE, gy);
+                ctx.lineTo(gx + CELL_SIZE, gy + CELL_SIZE);
+            }
+            if (!inAura(col, row - 1)) {
+                ctx.moveTo(gx, gy);
+                ctx.lineTo(gx + CELL_SIZE, gy);
+            }
+            if (!inAura(col, row + 1)) {
+                ctx.moveTo(gx, gy + CELL_SIZE);
+                ctx.lineTo(gx + CELL_SIZE, gy + CELL_SIZE);
+            }
+        }
+    }
+    ctx.stroke();
+    ctx.setLineDash([]);
+}
+
 function renderSelectedOverlay(ctx, game) {
     if (!game.selectedTower) return;
     const tower = game.selectedTower;
     const x = GRID_OFFSET_X + tower.col * CELL_SIZE;
     const y = GRID_OFFSET_Y + tower.row * CELL_SIZE;
+
+    if (tower.id === 'shiba') {
+        renderShibaAuraCoverage(ctx, tower);
+    }
 
     ctx.fillStyle = COLORS.selectedHighlight;
     ctx.fillRect(x, y, CELL_SIZE, CELL_SIZE);

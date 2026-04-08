@@ -114,7 +114,9 @@ export class Enemy {
         this.stunTimer = Math.max(this.stunTimer, duration);
     }
 
-    /** @param {Tower | null} [attackerTower] burn kill credits this tower */
+    /**
+     * @param {Tower | null} [attackerTower]
+     */
     applyBurn(dps, duration, attackerTower = null) {
         if (attackerTower) this.lastHitTower = attackerTower;
         this.burnDps = dps;
@@ -124,6 +126,50 @@ export class Enemy {
     getHpRatio() {
         return this.hp / this.maxHp;
     }
+}
+
+/** Manhattan distance cap from a Shiba to receive its aura: T1 → 1, T2/T3 → 2. */
+export function shibaAuraManhattanLimit(shibaTier) {
+    return shibaTier >= 1 ? 2 : 1;
+}
+
+/**
+ * @param {{ col: number, row: number }} recipient
+ * @param {{ col: number, row: number, id: string, tier: number }} shibaSource
+ */
+export function shibaAuraApplies(recipient, shibaSource) {
+    if (shibaSource.id !== 'shiba') return false;
+    const d = Math.abs(recipient.col - shibaSource.col) + Math.abs(recipient.row - shibaSource.row);
+    if (d < 1) return false;
+    return d <= shibaAuraManhattanLimit(shibaSource.tier);
+}
+
+/**
+ * At most one Shiba aura applies: strongest `speedBuff` wins. Ties: higher tier, then lower (col, row).
+ * @returns {Tower | null}
+ */
+export function pickBestShibaAuraSource(recipient, towers) {
+    let best = null;
+    for (const t of towers) {
+        if (t === recipient || t.id !== 'shiba') continue;
+        if (!shibaAuraApplies(recipient, t)) continue;
+        const sp = t.stats.special;
+        if (!sp || sp.type !== 'aura') continue;
+        if (!best) {
+            best = t;
+            continue;
+        }
+        const sb = best.stats.special;
+        if (sp.speedBuff > sb.speedBuff) {
+            best = t;
+        } else if (sp.speedBuff === sb.speedBuff) {
+            if (t.tier > best.tier) best = t;
+            else if (t.tier === best.tier && (t.col < best.col || (t.col === best.col && t.row < best.row))) {
+                best = t;
+            }
+        }
+    }
+    return best;
 }
 
 export class Tower {
@@ -148,21 +194,16 @@ export class Tower {
     getBuffedStats(towers) {
         let speedMult = 1.0;
         let damageMult = 1.0;
-        for (const t of towers) {
-            if (t === this) continue;
-            if (t.id !== 'shiba') continue;
-            const dx = Math.abs(t.col - this.col);
-            const dy = Math.abs(t.row - this.row);
-            if ((dx === 1 && dy === 0) || (dx === 0 && dy === 1)) {
-                const sp = t.stats.special;
-                if (sp && sp.type === 'aura') {
-                    speedMult *= (1 - sp.speedBuff);
-                    if (sp.damageBuff) damageMult += sp.damageBuff;
-                }
+        const bestShiba = pickBestShibaAuraSource(this, towers);
+        if (bestShiba) {
+            const sp = bestShiba.stats.special;
+            if (sp && sp.type === 'aura') {
+                speedMult *= (1 - sp.speedBuff);
+                if (sp.damageBuff) damageMult += sp.damageBuff;
             }
         }
         return {
-            damage: Math.round(this.stats.damage * damageMult),
+            damage: Math.ceil(this.stats.damage * damageMult - 1e-9),
             range: this.stats.range,
             speed: Math.round(this.stats.speed * speedMult),
             special: this.stats.special,

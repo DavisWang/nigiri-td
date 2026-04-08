@@ -188,17 +188,15 @@ Multi-target. Attacks several nigiri simultaneously.
 | Special | Hits 3 targets | Hits 4 targets | Hits 5 + ink slow (15% for 1s) |
 
 #### 8. Shiba Inu
-Support. Buffs adjacent towers' attack speed.
+Support. Buffs **other** towers’ attack speed (and T3: damage) within **Manhattan** distance: **≤ 1** at T1, **≤ 2** at T2/T3. **Only one** Shiba aura applies per tower (strongest `speedBuff`, then tier, then grid tie-break). Buffed damage uses **ceiling** after the damage multiplier. In-game: selecting a Shiba shows the aura footprint on the grid.
 
 | Stat | Tier 1 | Tier 2 (+100) | Tier 3 (+150) |
 | --- | --- | --- | --- |
 | Cost (total) | 125 | 225 | 375 |
-| Damage | 4 | 6 | 10 |
+| Damage | 4 | 5 | 9 |
 | Range | 2.0 | 2.0 | 2.5 |
-| Speed (ms) | 1000 | 900 | 800 |
-| Special | +15% adj speed | +20% adj speed | +30% adj speed, +10% adj damage |
-
-"Adjacent" means towers in the 4 orthogonal neighbors of the Shiba's cell.
+| Speed (ms) | 1000 | 990 | 880 |
+| Special | +15% nearby atk speed | +18% nearby atk speed | +27% nearby atk speed, +9% nearby dmg |
 
 #### 9. Bear (Kuma)
 Heavy hitter. Slow but devastating single bites.
@@ -345,9 +343,9 @@ Area towers (Dragon, Bear Tier 3) deal full damage to the primary target and ful
 
 ### Support Buff (Shiba Inu)
 
-- The speed buff is recalculated whenever a tower is placed, sold, or upgraded adjacent to a Shiba.
-- Multiple Shibas' buffs stack additively on the same tower.
-- The Tier 3 damage buff also stacks additively.
+- The aura is recalculated whenever towers move (place, sell, upgrade). Range is **Manhattan** from the Shiba (T1: 1, T2/T3: 2).
+- **At most one** Shiba affects a given tower: pick the aura with the largest **`speedBuff`**, then higher **tier**, then stable grid order.
+- T3 **damageBuff** applies only from that same winning Shiba; final damage is **`ceil(base × mult)`**.
 
 ---
 

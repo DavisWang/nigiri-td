@@ -25,7 +25,7 @@ Conveyor sushi heads toward the trash. You place **animals** on buildable seats 
   - **U** / **S** — upgrade / sell selected tower.
   - **M** — mute.
   - **+** / **=** or numpad **+** — faster game speed during an active wave; **−** or numpad **−** — slower (same steps as the sidebar buttons).
-  - **1–9**, **0** — select tower for placement (shop order: **1** Cat … **0** Dragon); press again to cancel. Not used on map/difficulty screens (those use **1–4** / **1–3** there).
+  - **1–9**, **0** — select tower for placement (shop order: **1** Cat … **0** Dragon); press again to cancel. Not used on map/difficulty screens (those use **1–6** / **1–3** there).
 - **Map / difficulty screens:** **1–6** quick-pick map (card order), **1–3** difficulty, **Esc** back.
 
 ### Touch (iPhone / iPad)
@@ -54,6 +54,13 @@ When a tower is selected, **Targeting** chooses how it picks enemies **in range*
 | --- | --- |
 | **Weakest first** | Lowest **current HP**, then furthest along the belt as a tie-break. |
 | **Furthest first** | Furthest along the belt toward the trash (**default**, matches legacy behavior), then lowest HP as a tie-break. |
+
+## Shiba Inu (aura)
+
+- **Range:** Other towers within **Manhattan distance** **≤ 1** from a T1 Shiba, or **≤ 2** from a T2/T3 Shiba (Shiba’s own cell does not buff itself).
+- **No stacking:** If several Shibas could buff the same tower, only **one** applies: highest **`speedBuff`** wins; ties use higher **tier**, then lower **(column, row)** for a stable pick. Speed uses that Shiba’s `(1 − speedBuff)` once; T3 **damageBuff** comes only from that same Shiba.
+- **Damage rounding:** Buffed hit damage uses **`ceil(base × damageMult)`** so small base damage still gains from the T3 aura.
+- **UI:** Select a Shiba to see its aura footprint (amber cells + dashed outline). Attack range (blue) is unchanged.
 
 ## Tanuki kill gold
 

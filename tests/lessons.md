@@ -18,3 +18,8 @@ When adding maps or resizing map cards, re-check **width** (≤ `CANVAS_WIDTH`) 
 - **Symptom:** Exit tile rollers animate opposite to the tile before it (obvious on **perimeter** where exit `(0,1)` follows `(0,2)` vertically).
 - **Cause:** `MapContext._recompute` only set `_flowDirs` when a segment had a **`next`** cell. The final cell had no `next`, so `getBeltFlowDir` used **`|| 1`**, which is wrong for upward or leftward arrivals.
 - **Fix:** If there is no `next` but there is **`prev`**, set flow from **`prev → p`** (same convention as travel into that cell). Run `tests/belt-flow-dir.test.mjs`.
+
+## Shiba aura rules
+
+- **Manhattan** range: T1 cap **1**, T2/T3 cap **2** (`shibaAuraManhattanLimit`). Logic lives in `entities.js` with `pickBestShibaAuraSource` (no multi-Shiba stacking on one tower).
+- **Guard:** Run `tests/shiba-aura.test.mjs`. Tie-break tests need Shibas actually **in range** of the recipient (T1 cannot reach Manhattan 2).

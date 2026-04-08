@@ -42,7 +42,7 @@ npm install
 npm test
 ```
 
-Tests are Node-based checks for map paths, belt tile orientation, sidebar layout, round ladder, **infinite-mode** scalers / wave template, and **test mode** (same rounds / victory offer as a normal run, unlimited money only — no browser required).
+Tests are Node-based checks for map paths, belt tile orientation, sidebar layout, Shiba aura (Manhattan + single-source buff), round ladder, **infinite-mode** scalers / wave template, and **test mode** (same rounds / victory offer as a normal run, unlimited money only — no browser required).
 
 ## Project layout
 
@@ -53,7 +53,7 @@ Tests are Node-based checks for map paths, belt tile orientation, sidebar layout
 | `src/js/input.js` | Pointer + touch/mouse input, key / code tracking |
 | `src/js/game.js` | Rounds, waves, economy, kill payouts, difficulty multipliers, infinite mode |
 | `src/js/data.js` | Maps, towers, enemies, `DIFFICULTY_PROFILES`, `GAME_SPEED_LEVELS` |
-| `src/js/entities.js` | `Enemy`, `Tower` (attacks, targeting, damage) |
+| `src/js/entities.js` | `Enemy`, `Tower` (attacks, targeting, Shiba aura helpers) |
 | `src/js/ui.js` | HUD, shop, sidebar panels, overlays, back button |
 | `src/js/effects.js` | Floating text, particles, round banners |
 | `src/js/i18n.js` | EN / 简体中文 strings, locale toggle persistence |
