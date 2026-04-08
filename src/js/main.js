@@ -595,7 +595,8 @@ const CARD_W = 172;
 const CARD_H = 210;
 const CARD_GAP = 14;
 
-const MAP_SELECT_COLS = 2;
+/** 3×2 grid for six maps — wider than tall so the block fits below the title (2×3 overflows vertically). */
+const MAP_SELECT_COLS = 3;
 
 function getMapCardRects() {
     const maps = MAP_DEFINITIONS;

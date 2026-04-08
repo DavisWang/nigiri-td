@@ -76,6 +76,24 @@ check('fork: enemy uses branch A or B (not a third path)', () => {
     assert.deepEqual(lastCell(p), { x: 7, y: 9 });
 });
 
+check('runway: straight horizontal path (not Kaiten)', () => {
+    const game = spawnFirstEnemy('runway');
+    const p = game.enemies[0].mapPath;
+    assert.notStrictEqual(p, MAP_PATH);
+    assert.equal(p.length, 8);
+    assert.deepEqual(p[0], { x: 0, y: 5 });
+    assert.deepEqual(lastCell(p), { x: 7, y: 5 });
+});
+
+check('perimeter: full outer ring, exit (0,1)', () => {
+    const game = spawnFirstEnemy('perimeter');
+    const p = game.enemies[0].mapPath;
+    assert.notStrictEqual(p, MAP_PATH);
+    assert.equal(p.length, 32);
+    assert.deepEqual(p[0], { x: 0, y: 0 });
+    assert.deepEqual(lastCell(p), { x: 0, y: 1 });
+});
+
 console.log('\nEnemy path / map wiring:\n');
 console.log(`Results: ${passed} passed, ${failed} failed`);
 if (failed > 0) process.exit(1);

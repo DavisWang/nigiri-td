@@ -270,12 +270,16 @@ const MAPS = {
         fork: 'The Fork',
         spiral: 'The Spiral',
         cross: 'The Crossroads',
+        runway: 'The Runway',
+        perimeter: 'The Perimeter',
     },
     zh: {
         kaiten: '回转角落',
         fork: '分叉路口',
         spiral: '螺旋路径',
         cross: '十字路口',
+        runway: '直线跑道',
+        perimeter: '外环',
     },
 };
 

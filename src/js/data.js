@@ -111,6 +111,19 @@ const KAITEN_PATH = [
     {x:7,y:9},
 ];
 
+/** One straight horizontal belt (row 5); seats on rows 4 and 6. */
+const RUNWAY_PATH = [
+    { x: 0, y: 5 }, { x: 1, y: 5 }, { x: 2, y: 5 }, { x: 3, y: 5 }, { x: 4, y: 5 }, { x: 5, y: 5 }, { x: 6, y: 5 }, { x: 7, y: 5 },
+];
+
+/** Full outer ring of the 8×10 grid (32 cells); entry (0,0), exit (0,1). */
+const PERIMETER_PATH = [
+    { x: 0, y: 0 }, { x: 1, y: 0 }, { x: 2, y: 0 }, { x: 3, y: 0 }, { x: 4, y: 0 }, { x: 5, y: 0 }, { x: 6, y: 0 }, { x: 7, y: 0 },
+    { x: 7, y: 1 }, { x: 7, y: 2 }, { x: 7, y: 3 }, { x: 7, y: 4 }, { x: 7, y: 5 }, { x: 7, y: 6 }, { x: 7, y: 7 }, { x: 7, y: 8 }, { x: 7, y: 9 },
+    { x: 6, y: 9 }, { x: 5, y: 9 }, { x: 4, y: 9 }, { x: 3, y: 9 }, { x: 2, y: 9 }, { x: 1, y: 9 }, { x: 0, y: 9 },
+    { x: 0, y: 8 }, { x: 0, y: 7 }, { x: 0, y: 6 }, { x: 0, y: 5 }, { x: 0, y: 4 }, { x: 0, y: 3 }, { x: 0, y: 2 }, { x: 0, y: 1 },
+];
+
 export const MAP_DEFINITIONS = [
     {
         id: 'kaiten', name: 'Kaiten Corner',
@@ -157,6 +170,18 @@ export const MAP_DEFINITIONS = [
             {x:0,y:5},{x:0,y:6},{x:0,y:7},{x:0,y:8},{x:0,y:9},
         ],
         crossCell: {x:4,y:4},
+        rounds: SHARED_ROUNDS,
+    },
+    {
+        id: 'runway', name: 'The Runway',
+        type: 'single',
+        path: RUNWAY_PATH,
+        rounds: SHARED_ROUNDS,
+    },
+    {
+        id: 'perimeter', name: 'The Perimeter',
+        type: 'single',
+        path: PERIMETER_PATH,
         rounds: SHARED_ROUNDS,
     },
 ];
@@ -230,9 +255,14 @@ export class MapContext {
             for (let i = 0; i < path.length; i++) {
                 const p = path[i];
                 const key = `${p.x},${p.y}`;
+                if (this._flowDirs[key]) continue;
                 const next = i < path.length - 1 ? path[i + 1] : null;
-                if (next && !this._flowDirs[key]) {
+                const prev = i > 0 ? path[i - 1] : null;
+                if (next) {
                     this._flowDirs[key] = next.x !== p.x ? (next.x > p.x ? 1 : -1) : (next.y > p.y ? 1 : -1);
+                } else if (prev) {
+                    // Last cell: no `next` — use incoming segment so rollers match travel (was default +1).
+                    this._flowDirs[key] = p.x !== prev.x ? (p.x > prev.x ? 1 : -1) : (p.y > prev.y ? 1 : -1);
                 }
             }
         }

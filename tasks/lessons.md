@@ -56,3 +56,9 @@
 - Each `new Enemy(id, this.pathProvider())` stores that array on `enemy.mapPath`; `_updatePosition()` must read only `this.mapPath`, never an imported global path.
 
 **Rule:** When changing map or path logic, run `npm test` (includes `tests/enemy-path.test.mjs`). Do not use `MAP_PATH` for runtime enemy movement on non-Kaiten maps; keep `MAP_PATH` only as a backward-compatible export aligned with the Kaiten definition.
+
+## Map select: prefer more columns than rows on a short canvas
+
+**Pattern:** With six maps, a **2×3** card grid (two columns) needs three rows; card height × rows exceeds the vertical band between the title and footer on `CANVAS_HEIGHT` 640, so cards overflow.
+
+**Rule:** Use **`MAP_SELECT_COLS = 3`** (3×2) unless canvas height or card sizes change. Keep `tests/map-select-layout.test.mjs` in sync with `getMapCardRects()` in `main.js`. Details: `tests/lessons.md`.

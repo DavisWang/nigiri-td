@@ -26,7 +26,7 @@ Conveyor sushi heads toward the trash. You place **animals** on buildable seats 
   - **M** — mute.
   - **+** / **=** or numpad **+** — faster game speed during an active wave; **−** or numpad **−** — slower (same steps as the sidebar buttons).
   - **1–9**, **0** — select tower for placement (shop order: **1** Cat … **0** Dragon); press again to cancel. Not used on map/difficulty screens (those use **1–4** / **1–3** there).
-- **Map / difficulty screens:** **1–4** quick-pick map, **1–3** difficulty, **Esc** back.
+- **Map / difficulty screens:** **1–6** quick-pick map (card order), **1–3** difficulty, **Esc** back.
 
 ### Touch (iPhone / iPad)
 
