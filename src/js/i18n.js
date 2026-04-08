@@ -287,13 +287,13 @@ const MAPS = {
 const DIFF = {
     en: {
         easy: { label: 'Easy', hint: 'Baseline HP & spawn timing' },
-        intermediate: { label: 'Intermediate', hint: '+25% enemy HP' },
-        hard: { label: 'Hard', hint: '+25% HP · 10% faster spawns' },
+        intermediate: { label: 'Intermediate', hint: '+10% enemy HP' },
+        hard: { label: 'Hard', hint: '+20% HP · 10% faster spawns' },
     },
     zh: {
         easy: { label: '简单', hint: '标准血量与出怪节奏' },
-        intermediate: { label: '进阶', hint: '敌人生命 +25%' },
-        hard: { label: '困难', hint: '生命 +25% · 出怪加快 10%' },
+        intermediate: { label: '进阶', hint: '敌人生命 +10%' },
+        hard: { label: '困难', hint: '生命 +20% · 出怪加快 10%' },
     },
 };
 

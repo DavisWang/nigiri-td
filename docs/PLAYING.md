@@ -11,7 +11,7 @@ Conveyor sushi heads toward the trash. You place **animals** on buildable seats 
 - **Language:** top-right on the title screen toggles **English** / **简体中文** (saved in `localStorage`).
 - **How to Play** on the title is optional flavor text plus a tiny belt vignette.
 - **Test Mode** (title) is the same as a normal run (all 10 rounds per map, infinite mode, difficulty) except **unlimited money** for placing and upgrading.
-- **Crossroads** map includes extra starting money (see `startingMoneyBonus` in `data.js`).
+- **Crossroads** (+165), **Runway** and **Perimeter** (+200 each) include extra starting money (`startingMoneyBonus` in `data.js`). **Runway** also adds **+$50** on every **campaign** round clear (rounds 1–10 only; not infinite); see `RUNWAY_CAMPAIGN_ROUND_BONUS` in `data.js`.
 
 ## Controls
 
@@ -41,8 +41,8 @@ Conveyor sushi heads toward the trash. You place **animals** on buildable seats 
 | Mode           | Effect |
 | -------------- | ------ |
 | Easy           | Baseline enemy HP and spawn timing. |
-| Intermediate   | **+25%** enemy HP. |
-| Hard           | **+25%** HP and **10%** faster spawns (shorter interval). |
+| Intermediate   | **+10%** enemy HP. |
+| Hard           | **+20%** HP and **10%** faster spawns (shorter interval). |
 
 Global tower and enemy definitions in `ENEMY_DATA` / `TOWER_DATA` are unchanged; only multipliers for that run apply.
 

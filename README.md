@@ -70,7 +70,7 @@ Sound starts **muted** until the player enables it (speaker or **M**). When enab
 
 ## Maps & difficulty
 
-Six maps in `MAP_DEFINITIONS` in `src/js/data.js` (including straight **Runway** and outer-ring **Perimeter**). Each run picks **Easy**, **Intermediate** (+25% enemy HP), or **Hard** (+25% HP and faster spawns). See [docs/PLAYING.md](docs/PLAYING.md).
+Six maps in `MAP_DEFINITIONS` in `src/js/data.js` (including straight **Runway** and outer-ring **Perimeter**). Each run picks **Easy**, **Intermediate** (+10% enemy HP), or **Hard** (+20% HP and 10% faster spawns). See [docs/PLAYING.md](docs/PLAYING.md).
 
 ## Deploy to GitHub Pages
 

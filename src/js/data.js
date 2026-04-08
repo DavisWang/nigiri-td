@@ -59,43 +59,43 @@ export const TOWER_DATA = [
 ];
 
 export const ENEMY_DATA = [
-    { id: 'tamago', name: 'Tamago', hp: 15, speed: 1.0, money: 5, lifePenalty: 1, tier: 'Common', color: '#FFD54F' },
-    { id: 'salmon', name: 'Salmon', hp: 30, speed: 1.0, money: 8, lifePenalty: 1, tier: 'Common', color: '#FF8A65' },
-    { id: 'squid', name: 'Squid', hp: 55, speed: 0.8, money: 9, lifePenalty: 2, tier: 'Standard', color: '#ECEFF1' },
-    { id: 'shrimp', name: 'Shrimp', hp: 72, speed: 1.1, money: 10, lifePenalty: 2, tier: 'Standard', color: '#FFAB91' },
-    { id: 'tuna', name: 'Tuna', hp: 94, speed: 1.0, money: 13, lifePenalty: 2, tier: 'Standard', color: '#EF5350' },
-    { id: 'mackerel', name: 'Mackerel', hp: 121, speed: 1.2, money: 16, lifePenalty: 3, tier: 'Premium', color: '#90A4AE' },
-    { id: 'scallop', name: 'Hotate', hp: 154, speed: 1.0, money: 19, lifePenalty: 3, tier: 'Premium', color: '#FFF9C4' },
-    { id: 'ikura', name: 'Ikura', hp: 228, speed: 1.3, money: 24, lifePenalty: 4, tier: 'Deluxe', color: '#FF7043' },
-    { id: 'uni', name: 'Uni', hp: 304, speed: 1.1, money: 30, lifePenalty: 4, tier: 'Deluxe', color: '#FFB300' },
-    { id: 'wagyu', name: 'Wagyu', hp: 443, speed: 1.0, money: 42, lifePenalty: 5, tier: 'Boss', color: '#EF5350' },
+    { id: 'tamago', name: 'Tamago', hp: 15, speed: 0.9, money: 5, lifePenalty: 1, tier: 'Common', color: '#FFD54F' },
+    { id: 'salmon', name: 'Salmon', hp: 30, speed: 0.9, money: 8, lifePenalty: 1, tier: 'Common', color: '#FF8A65' },
+    { id: 'squid', name: 'Squid', hp: 55, speed: 0.7, money: 9, lifePenalty: 2, tier: 'Standard', color: '#ECEFF1' },
+    { id: 'shrimp', name: 'Shrimp', hp: 72, speed: 1.0, money: 10, lifePenalty: 2, tier: 'Standard', color: '#FFAB91' },
+    { id: 'tuna', name: 'Tuna', hp: 94, speed: 0.9, money: 13, lifePenalty: 2, tier: 'Standard', color: '#EF5350' },
+    { id: 'mackerel', name: 'Mackerel', hp: 121, speed: 1.1, money: 16, lifePenalty: 3, tier: 'Premium', color: '#90A4AE' },
+    { id: 'scallop', name: 'Hotate', hp: 154, speed: 0.9, money: 19, lifePenalty: 3, tier: 'Premium', color: '#FFF9C4' },
+    { id: 'ikura', name: 'Ikura', hp: 228, speed: 1.2, money: 24, lifePenalty: 4, tier: 'Deluxe', color: '#FF7043' },
+    { id: 'uni', name: 'Uni', hp: 304, speed: 1.0, money: 30, lifePenalty: 4, tier: 'Deluxe', color: '#FFB300' },
+    { id: 'wagyu', name: 'Wagyu', hp: 443, speed: 0.9, money: 42, lifePenalty: 5, tier: 'Boss', color: '#EF5350' },
 ];
 
 /**
- * Baseline HP step multipliers R1→R2 … R9→R10 (linear ramp 1.3× → 1.7×).
+ * Baseline HP step multipliers R1→R2 … R9→R10 (+20% first step, +5%pts each later step → 1.20× … 1.60×).
  * Regenerate waves: `node scripts/generate-balanced-rounds.mjs`
  */
 export const ROUND_HP_STEP_MULTS = Object.freeze([
-    1.3, 1.35, 1.4, 1.45, 1.5, 1.55, 1.6, 1.65, 1.7,
+    1.2, 1.25, 1.3, 1.35, 1.4, 1.45, 1.5, 1.55, 1.6,
 ]);
 
-/** Strength tiers 1–10: round R primarily uses `ENEMY_STRENGTH_IDS[R-1]` plus types within ±2 tiers (clamped). */
+/** Strength tiers 1–10: round R waves use only tiers R−1, R, R+1 (clamped to 1..10). */
 export const ENEMY_STRENGTH_IDS = ENEMY_DATA.map((e) => e.id);
 
 function e(id, count) { return { id, count }; }
 
-/** Regenerate: `node scripts/generate-balanced-rounds.mjs` (PRIMARY_HP_FRAC in script). */
+/** Regenerated: `node scripts/generate-balanced-rounds.mjs` — ±1 tier band, `ROUND_HP_STEP_MULTS`, PRIMARY_HP_FRAC 0.45. */
 const SHARED_ROUNDS = [
     { round: 1, waves: [e('tamago', 8)], spawnInterval: 1700 },
     { round: 2, waves: [e('salmon', 3), e('tamago', 1), e('squid', 1)], spawnInterval: 1560 },
-    { round: 3, waves: [e('squid', 2), e('tamago', 1), e('salmon', 1), e('shrimp', 1)], spawnInterval: 1420 },
-    { round: 4, waves: [e('shrimp', 3), e('salmon', 1), e('squid', 1), e('tuna', 1)], spawnInterval: 1300 },
-    { round: 5, waves: [e('tuna', 4), e('squid', 1), e('shrimp', 1), e('mackerel', 1)], spawnInterval: 1180 },
-    { round: 6, waves: [e('mackerel', 4), e('shrimp', 1), e('tuna', 1), e('scallop', 1), e('ikura', 1)], spawnInterval: 1080 },
-    { round: 7, waves: [e('scallop', 5), e('tuna', 2), e('mackerel', 1), e('ikura', 1), e('uni', 1)], spawnInterval: 1000 },
-    { round: 8, waves: [e('ikura', 6), e('mackerel', 2), e('scallop', 2), e('uni', 1), e('wagyu', 1)], spawnInterval: 920 },
-    { round: 9, waves: [e('uni', 7), e('scallop', 3), e('ikura', 3), e('wagyu', 3)], spawnInterval: 850 },
-    { round: 10, waves: [e('wagyu', 9), e('ikura', 8), e('uni', 7)], spawnInterval: 780 },
+    { round: 3, waves: [e('squid', 2), e('salmon', 1), e('shrimp', 1)], spawnInterval: 1420 },
+    { round: 4, waves: [e('shrimp', 2), e('squid', 1), e('tuna', 1)], spawnInterval: 1300 },
+    { round: 5, waves: [e('tuna', 3), e('shrimp', 1), e('mackerel', 1)], spawnInterval: 1180 },
+    { round: 6, waves: [e('mackerel', 3), e('tuna', 2), e('scallop', 1)], spawnInterval: 1080 },
+    { round: 7, waves: [e('scallop', 4), e('mackerel', 2), e('ikura', 1)], spawnInterval: 1000 },
+    { round: 8, waves: [e('ikura', 4), e('scallop', 2), e('uni', 2)], spawnInterval: 920 },
+    { round: 9, waves: [e('uni', 5), e('ikura', 2), e('wagyu', 2)], spawnInterval: 850 },
+    { round: 10, waves: [e('wagyu', 5), e('uni', 8)], spawnInterval: 780 },
 ];
 
 const KAITEN_PATH = [
@@ -115,6 +115,9 @@ const KAITEN_PATH = [
 const RUNWAY_PATH = [
     { x: 0, y: 5 }, { x: 1, y: 5 }, { x: 2, y: 5 }, { x: 3, y: 5 }, { x: 4, y: 5 }, { x: 5, y: 5 }, { x: 6, y: 5 }, { x: 7, y: 5 },
 ];
+
+/** Campaign only: extra cash each time you clear a wave on runway (not infinite). See `game.js` `_endRound`. */
+export const RUNWAY_CAMPAIGN_ROUND_BONUS = 50;
 
 /** Full outer ring of the 8×10 grid (32 cells); entry (0,0), exit (0,1). */
 const PERIMETER_PATH = [
@@ -174,12 +177,14 @@ export const MAP_DEFINITIONS = [
     },
     {
         id: 'runway', name: 'The Runway',
+        startingMoneyBonus: 200,
         type: 'single',
         path: RUNWAY_PATH,
         rounds: SHARED_ROUNDS,
     },
     {
         id: 'perimeter', name: 'The Perimeter',
+        startingMoneyBonus: 200,
         type: 'single',
         path: PERIMETER_PATH,
         rounds: SHARED_ROUNDS,
@@ -195,8 +200,8 @@ export const DIFFICULTY_ORDER = ['easy', 'intermediate', 'hard'];
 
 export const DIFFICULTY_PROFILES = {
     easy: { label: 'Easy', hint: 'Baseline HP & spawn timing', hpMult: 1, spawnIntervalMult: 1, accent: '#52BE80' },
-    intermediate: { label: 'Intermediate', hint: '+25% enemy HP', hpMult: 1.25, spawnIntervalMult: 1, accent: '#F39C12' },
-    hard: { label: 'Hard', hint: '+25% HP · 10% faster spawns', hpMult: 1.25, spawnIntervalMult: 0.9, accent: '#E74C3C' },
+    intermediate: { label: 'Intermediate', hint: '+10% enemy HP', hpMult: 1.1, spawnIntervalMult: 1, accent: '#F39C12' },
+    hard: { label: 'Hard', hint: '+20% HP · 10% faster spawns', hpMult: 1.2, spawnIntervalMult: 0.9, accent: '#E74C3C' },
 };
 
 export function getDifficultyProfile(id) {

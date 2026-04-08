@@ -1,28 +1,17 @@
 /**
  * One-off / regen helper: builds 10 rounds with:
- * - Per-step HP multipliers (R1→R2 … R9→R10): linear ramp 1.5 → 2.0
- * - Round R features strength-R enemy (ENEMY_DATA order); only tiers R-2..R+2 (clamped)
+ * - Per-step HP multipliers: `ROUND_HP_STEP_MULTS` in data.js (R1→R2 … R9→R10)
+ * - Round R: only nigiri tiers R−1, R, R+1 (1-based; clamped to 1..10) in ENEMY_DATA order
  * - Primary type supplies >= PRIMARY_HP_FRAC of total HP
  *
  * Run: node scripts/generate-balanced-rounds.mjs
  */
 
-import { ROUND_HP_STEP_MULTS } from '../src/js/data.js';
+import { ROUND_HP_STEP_MULTS, ENEMY_DATA } from '../src/js/data.js';
 
 const PRIMARY_HP_FRAC = 0.45;
 
-const ENEMIES = [
-    { id: 'tamago', hp: 15 },
-    { id: 'salmon', hp: 30 },
-    { id: 'squid', hp: 55 },
-    { id: 'shrimp', hp: 72 },
-    { id: 'tuna', hp: 94 },
-    { id: 'mackerel', hp: 121 },
-    { id: 'scallop', hp: 154 },
-    { id: 'ikura', hp: 228 },
-    { id: 'uni', hp: 304 },
-    { id: 'wagyu', hp: 443 },
-];
+const ENEMIES = ENEMY_DATA.map((e) => ({ id: e.id, hp: e.hp }));
 
 const HP = Object.fromEntries(ENEMIES.map((e) => [e.id, e.hp]));
 const ORDER = ENEMIES.map((e) => e.id);
@@ -31,9 +20,9 @@ function ceilMul(a, b) {
     return Math.ceil(a * b - 1e-9);
 }
 
+/** Tier index bounds (0..9) for round r: tiers r−1..r+1 → indices r−2..r (clamped). */
 function allowedRange(r) {
-    const p = r - 1;
-    return [Math.max(0, p - 2), Math.min(9, p + 2)];
+    return [Math.max(0, r - 2), Math.min(9, r)];
 }
 
 /**

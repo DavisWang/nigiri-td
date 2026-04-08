@@ -2,7 +2,7 @@ import {
     STARTING_MONEY, STARTING_LIFE, TOWER_DATA, ENEMY_DATA,
     GRID_COLS, GRID_ROWS,
     getTotalCost, getSellValue, getUpgradeCost, getRoundBonus, buildSpawnQueue,
-    MapContext, getMapById, getDifficultyProfile,
+    MapContext, getMapById, getDifficultyProfile, RUNWAY_CAMPAIGN_ROUND_BONUS,
     buildInfiniteRoundData, getInfiniteHpMult, getInfiniteSpeedMult, getInfiniteMoneyMult,
     getInfiniteSpawnIntervalMult, getInfiniteRoundBonus,
     GAME_SPEED_LEVELS,
@@ -255,7 +255,10 @@ export class GameState {
             return;
         }
 
-        const bonus = getRoundBonus(this.round + 1);
+        const baseBonus = getRoundBonus(this.round + 1);
+        const runwayExtra =
+            this.mapId === 'runway' && !this.infiniteMode ? RUNWAY_CAMPAIGN_ROUND_BONUS : 0;
+        const bonus = baseBonus + runwayExtra;
         this.money += bonus;
         this.totalEarned += bonus;
         this.round++;

@@ -1,6 +1,6 @@
 /**
  * Round ladder: total baseline HP must grow by at least ROUND_HP_STEP_MULTS[r-2] (R1→R2 … R9→R10).
- * Waves must only use enemy tiers within ±2 of round primary tier (ENEMY_STRENGTH_IDS).
+ * Waves must only use enemy tiers within ±1 of round number (tier 1 = tamago … tier 10 = wagyu).
  * Primary type for round R is ENEMY_STRENGTH_IDS[R-1] and must account for >= 45% of total HP
  * (matches scripts/generate-balanced-rounds.mjs PRIMARY_HP_FRAC).
  *
@@ -48,8 +48,8 @@ for (const map of MAP_DEFINITIONS) {
     for (const rd of map.rounds) {
         const r = rd.round;
         const total = roundTotalHp(rd);
-        const lo = Math.max(0, r - 1 - 2);
-        const hi = Math.min(9, r - 1 + 2);
+        const lo = Math.max(0, r - 2);
+        const hi = Math.min(9, r);
 
         if (r === 1) {
             prev = total;
